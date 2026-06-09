@@ -1,0 +1,79 @@
+# ==========================================
+# Python
+# ==========================================
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# ==========================================
+# IDE
+# ==========================================
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ==========================================
+# Dataset Images (large binary files)
+# ==========================================
+dataset/**/*.jpg
+dataset/**/*.jpeg
+dataset/**/*.png
+dataset/**/*.bmp
+dataset/**/*.webp
+garbage_dataset/train/**/*
+garbage_dataset/val/**/*
+garbage_dataset/test/**/*
+garbage_dataset/logs/
+
+# Keep dataset structure but exclude images
+!dataset/**/
+!garbage_dataset/**/
+
+# ==========================================
+# Model Checkpoints & Binary Files (large)
+# ==========================================
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.pb
+outputs/**/*.pt
+outputs/**/*.onnx
+outputs/**/*.tflite
+export/**/*.onnx
+export/**/*.tflite
+export/**/*.pb
+export/**/*.tflite
+export/**/saved_model/
+
+# Keep export root-level model copies
+!export/latest_*
+
+# ==========================================
+# Training Outputs (large/runtime artifacts)
+# ==========================================
+outputs/*/
+
+# ==========================================
+# Capture Screenshots
+# ==========================================
+Captures_Final/*
+Captures_Locked_Trigger/*
+Captures_Servo_Char/*
+
+# ==========================================
+# Logs
+# ==========================================
+Logs/*
+*.log
+
+# ==========================================
+# CSV logs
+# ==========================================
+dataset/capture_log.csv
+garbage_dataset/logs/

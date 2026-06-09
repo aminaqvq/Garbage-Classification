@@ -1,0 +1,93 @@
+﻿index,backend,image_path,true_idx,true_class,pred_idx,pred_class,confidence,correct,latency_ms
+0,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\Residual (10)_crop.jpg,0,其他,0,其他,0.9998348951339722,1,4.517399998803739
+1,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\Residual (26)_crop.jpg,0,其他,0,其他,0.9993815422058105,1,3.237600001739338
+2,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\Residual (38)_crop.jpg,0,其他,0,其他,0.9999338388442993,1,3.1803999991097953
+3,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\Residual (65)_crop.jpg,0,其他,0,其他,0.999727189540863,1,3.246700000090641
+4,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\others.500_crop.jpg,0,其他,0,其他,0.9999501705169678,1,3.0177000007824972
+5,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\others.606_crop.jpg,0,其他,0,其他,0.9999997615814209,1,3.014199999597622
+6,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\others.607_crop.jpg,0,其他,0,其他,0.9999939203262329,1,3.27359999937471
+7,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0010.jpg,0,其他,0,其他,0.9985587000846863,1,3.4462999992683763
+8,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0099.jpg,0,其他,0,其他,0.9999997615814209,1,3.342599999086815
+9,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0155.jpg,0,其他,0,其他,0.9999997615814209,1,3.353199999764911
+10,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0163.jpg,0,其他,0,其他,0.9999911785125732,1,2.853500000128406
+11,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0184.jpg,0,其他,0,其他,0.9999998807907104,1,3.6306000001786742
+12,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0204.jpg,0,其他,0,其他,0.9999990463256836,1,3.149100000882754
+13,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0210.jpg,0,其他,0,其他,0.9999985694885254,1,3.4374000006209826
+14,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0223.jpg,0,其他,0,其他,0.9998255372047424,1,3.3803999995143386
+15,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0228.jpg,0,其他,0,其他,0.9999161958694458,1,3.324100000099861
+16,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0231.jpg,0,其他,0,其他,0.9999973773956299,1,3.324199999042321
+17,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0319.jpg,0,其他,0,其他,0.9997294545173645,1,3.195199999026954
+18,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0347.jpg,0,其他,0,其他,0.8818365931510925,1,3.4149999992223457
+19,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0349.jpg,0,其他,0,其他,0.9680737853050232,1,3.3605000007810304
+20,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\Kitchen_20251223_154959_0_crop.jpg,1,厨余,1,厨余,0.999995231628418,1,3.3719000002747634
+21,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\Kitchen_20251223_155009_2_crop.jpg,1,厨余,1,厨余,0.9999587535858154,1,3.3636999996815575
+22,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\Kitchen_20251223_162327_65_crop.jpg,1,厨余,1,厨余,0.9991031885147095,1,3.290200000265031
+23,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\Kitchen_20251223_162428_82_crop.jpg,1,厨余,1,厨余,0.9999885559082031,1,3.3302000010735355
+24,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\kitchen.104_crop.jpg,1,厨余,1,厨余,0.980141282081604,1,2.9173999992053723
+25,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\kitchen.117_crop.jpg,1,厨余,1,厨余,0.9999529123306274,1,2.8715999997075414
+26,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\kitchen.119_crop.jpg,1,厨余,1,厨余,0.9999909400939941,1,3.0351000004884554
+27,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0014.jpg,1,厨余,1,厨余,0.9998559951782227,1,3.0351000004884554
+28,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0041.jpg,1,厨余,1,厨余,0.9999721050262451,1,3.1053000002430053
+29,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0062.jpg,1,厨余,1,厨余,0.9999939203262329,1,3.4853000015573343
+30,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0084.jpg,1,厨余,1,厨余,0.9999837875366211,1,3.4945000006700866
+31,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0117.jpg,1,厨余,1,厨余,0.9999464750289917,1,3.4343999996053753
+32,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0148.jpg,1,厨余,1,厨余,0.9999973773956299,1,3.188399999999092
+33,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0152.jpg,1,厨余,1,厨余,0.9999761581420898,1,3.1159999998635612
+34,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0160.jpg,1,厨余,1,厨余,0.999976396560669,1,3.143600000839797
+35,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0179.jpg,1,厨余,1,厨余,0.9999938011169434,1,2.9441999995469814
+36,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0190.jpg,1,厨余,1,厨余,0.9999897480010986,1,3.544399998645531
+37,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0195.jpg,1,厨余,1,厨余,0.9999972581863403,1,3.275799999755691
+38,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0248.jpg,1,厨余,1,厨余,0.9999579191207886,1,3.187199999956647
+39,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0252.jpg,1,厨余,1,厨余,0.9999998807907104,1,3.495499999189633
+40,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recoverable (26)_crop.jpg,2,可回收,2,可回收,0.9999815225601196,1,3.4747000008792384
+41,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_145845_47_crop.jpg,2,可回收,2,可回收,0.998238205909729,1,3.016300001036143
+42,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_145850_48_crop.jpg,2,可回收,2,可回收,0.9999454021453857,1,2.880299998651026
+43,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_150957_55_crop.jpg,2,可回收,2,可回收,0.9461209177970886,1,3.4587999998620944
+44,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151028_63_crop.jpg,2,可回收,2,可回收,0.9999011754989624,1,3.3867000001919223
+45,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151102_75_crop.jpg,2,可回收,2,可回收,0.9999070167541504,1,3.5996000005980022
+46,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151346_149_crop.jpg,2,可回收,2,可回收,0.998829185962677,1,3.0679999999847496
+47,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151527_172_crop.jpg,2,可回收,2,可回收,0.9995229244232178,1,3.2279000006383285
+48,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151536_178_crop.jpg,2,可回收,2,可回收,0.9232574105262756,1,3.3272000000579283
+49,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151549_185_crop.jpg,2,可回收,2,可回收,0.9997879862785339,1,3.4879000013461336
+50,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclables. (22)_crop.jpg,2,可回收,2,可回收,0.9987871050834656,1,2.9685999998037005
+51,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclables. (23)_crop.jpg,2,可回收,2,可回收,0.9403807520866394,1,3.418199999941862
+52,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0002.jpg,2,可回收,2,可回收,0.9996680021286011,1,3.0055999995965976
+53,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0063.jpg,2,可回收,2,可回收,0.999677300453186,1,3.152700001010089
+54,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0098.jpg,2,可回收,2,可回收,0.9997846484184265,1,3.4843000012187986
+55,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0111.jpg,2,可回收,2,可回收,0.9855782389640808,1,2.965800000310992
+56,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0129.jpg,2,可回收,2,可回收,0.9995242357254028,1,3.344900000229245
+57,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0136.jpg,2,可回收,2,可回收,0.9963253140449524,1,3.3363000002282206
+58,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0154.jpg,2,可回收,2,可回收,0.9739550948143005,1,3.221299999495386
+59,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0175.jpg,2,可回收,2,可回收,0.9998518228530884,1,3.630900000644033
+60,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\Harmful_20251224_150040_5_crop.jpg,3,有害,3,有害,1.0,1,3.3958000003622146
+61,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\Harmful_20251224_150202_27_crop.jpg,3,有害,3,有害,0.9999377727508545,1,3.3409999996365514
+62,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (157)_crop.jpg,3,有害,3,有害,0.9999961853027344,1,3.3994999994320096
+63,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (162)_crop - 复制.jpg,3,有害,3,有害,0.9998242259025574,1,3.3101000008173287
+64,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (186)_crop - 复制.jpg,3,有害,3,有害,0.9990240335464478,1,3.295599999546539
+65,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (186)_crop.jpg,3,有害,3,有害,0.9990240335464478,1,3.279399999883026
+66,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (193)_crop - 复制.jpg,3,有害,3,有害,0.9997878670692444,1,3.0143999993015314
+67,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\hazardous (141)_crop.jpg,3,有害,3,有害,0.9999953508377075,1,3.0791000008321134
+68,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\hazardous (146)_crop.jpg,3,有害,3,有害,0.9979369640350342,1,3.3745000000635628
+69,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\hazardous (147)_crop.jpg,3,有害,3,有害,0.9998506307601929,1,3.393699998923694
+70,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0032.jpg,3,有害,3,有害,0.999915361404419,1,2.72439999935159
+71,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0074.jpg,3,有害,3,有害,0.9999996423721313,1,2.928400001110276
+72,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0082.jpg,3,有害,3,有害,0.9999922513961792,1,3.3839000006992137
+73,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0089.jpg,3,有害,3,有害,0.9999940395355225,1,3.367499999512802
+74,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0093.jpg,3,有害,3,有害,0.9999955892562866,1,3.3167000001412816
+75,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0100.jpg,3,有害,3,有害,0.9997263550758362,1,3.2862999996723374
+76,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0116.jpg,3,有害,3,有害,0.999607503414154,1,3.4219999997731065
+77,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0133.jpg,3,有害,3,有害,0.99997878074646,1,3.2797000003483845
+78,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0177.jpg,3,有害,3,有害,0.999996542930603,1,3.139500000543194
+79,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0203.jpg,3,有害,3,有害,1.0,1,3.5862000004271977
+80,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0260.jpg,3,有害,3,有害,0.9998030066490173,1,3.40669999968668
+81,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0292.jpg,3,有害,3,有害,0.9996005892753601,1,3.4529000004113186
+82,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0308.jpg,3,有害,3,有害,0.9874790906906128,1,3.3105000002251472
+83,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0323.jpg,3,有害,3,有害,0.9999877214431763,1,3.7990000000718283
+84,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0333.jpg,3,有害,3,有害,0.9999978542327881,1,3.512100000079954
+85,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0353.jpg,3,有害,3,有害,0.9998255372047424,1,2.965300000141724
+86,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0386.jpg,3,有害,3,有害,0.9999983310699463,1,3.403999999136431
+87,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0398.jpg,3,有害,3,有害,0.9999161958694458,1,3.1546999998681713
+88,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0400.jpg,3,有害,3,有害,0.9999728202819824,1,3.437800000028801
+89,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0408.jpg,3,有害,3,有害,0.999946117401123,1,3.546400001141592
+90,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0421.jpg,3,有害,3,有害,0.9971835017204285,1,3.2066000003396766
+91,onnx,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0454.jpg,3,有害,3,有害,0.9999960660934448,1,3.073599998970167

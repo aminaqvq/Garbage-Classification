@@ -1,0 +1,97 @@
+{
+    "created_time": "2026-05-25 11:36:33",
+    "data_dir": "D:\\ZTT\\Garbage Classification\\garbage_dataset",
+    "ckpt": "D:\\ZTT\\Garbage Classification\\outputs\\latest_mobilenetv3_best.pt",
+    "run_dir": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519",
+    "model_name": "mobilenet_v3_large",
+    "num_classes": 4,
+    "class_to_idx": {
+        "其他": 0,
+        "厨余": 1,
+        "可回收": 2,
+        "有害": 3
+    },
+    "idx_to_class": {
+        "0": "其他",
+        "1": "厨余",
+        "2": "可回收",
+        "3": "有害"
+    },
+    "test_samples": 92,
+    "calibration_samples": 500,
+    "baseline_pytorch_fp32_acc": 1.0,
+    "metrics": [
+        {
+            "backend": "pytorch_fp32",
+            "accuracy": 1.0,
+            "acc_drop_vs_pytorch_fp32": 0.0,
+            "avg_latency_ms": 13.749107608675885,
+            "num_samples": 92,
+            "classification_report_txt": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\pytorch_fp32_classification_report.txt",
+            "confusion_matrix_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\pytorch_fp32_confusion_matrix.csv",
+            "confusion_matrix_png": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\pytorch_fp32_confusion_matrix.png",
+            "per_image_predictions_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\pytorch_fp32_per_image_predictions.csv"
+        },
+        {
+            "backend": "onnx_fp32",
+            "accuracy": 1.0,
+            "acc_drop_vs_pytorch_fp32": 0.0,
+            "avg_latency_ms": 3.286660869612799,
+            "num_samples": 92,
+            "classification_report_txt": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\onnx_fp32_classification_report.txt",
+            "confusion_matrix_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\onnx_fp32_confusion_matrix.csv",
+            "confusion_matrix_png": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\onnx_fp32_confusion_matrix.png",
+            "per_image_predictions_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\onnx_fp32_per_image_predictions.csv"
+        },
+        {
+            "backend": "tflite_float32",
+            "accuracy": 1.0,
+            "acc_drop_vs_pytorch_fp32": 0.0,
+            "avg_latency_ms": 6.855603260725689,
+            "num_samples": 92,
+            "classification_report_txt": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_classification_report.txt",
+            "confusion_matrix_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_confusion_matrix.csv",
+            "confusion_matrix_png": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_confusion_matrix.png",
+            "per_image_predictions_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_per_image_predictions.csv"
+        },
+        {
+            "backend": "tflite_fp16",
+            "accuracy": 1.0,
+            "acc_drop_vs_pytorch_fp32": 0.0,
+            "avg_latency_ms": 6.497721739062557,
+            "num_samples": 92,
+            "classification_report_txt": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_fp16_classification_report.txt",
+            "confusion_matrix_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_fp16_confusion_matrix.csv",
+            "confusion_matrix_png": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_fp16_confusion_matrix.png",
+            "per_image_predictions_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_fp16_per_image_predictions.csv"
+        },
+        {
+            "backend": "tflite_int8",
+            "accuracy": 0.9347826086956522,
+            "acc_drop_vs_pytorch_fp32": 0.06521739130434778,
+            "avg_latency_ms": 15.14706086956484,
+            "num_samples": 92,
+            "classification_report_txt": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_int8_classification_report.txt",
+            "confusion_matrix_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_int8_confusion_matrix.csv",
+            "confusion_matrix_png": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_int8_confusion_matrix.png",
+            "per_image_predictions_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_int8_per_image_predictions.csv"
+        }
+    ],
+    "files": {
+        "config": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\config.json",
+        "class_mapping": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\class_mapping.json",
+        "dataset_summary": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\dataset_summary.csv",
+        "onnx": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\model_simplified.onnx",
+        "saved_model": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\saved_model",
+        "metrics_summary": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\metrics_summary.csv",
+        "model_size_report": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\model_size_report.csv",
+        "prediction_consistency": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\backend_prediction_consistency.csv",
+        "console_log": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\console.log",
+        "latest_files": {
+            "tflite_float32": "D:\\ZTT\\Garbage Classification\\export\\latest_tflite_float32.tflite",
+            "tflite_fp16": "D:\\ZTT\\Garbage Classification\\export\\latest_tflite_fp16.tflite",
+            "tflite_int8": "D:\\ZTT\\Garbage Classification\\export\\latest_tflite_int8.tflite",
+            "onnx": "D:\\ZTT\\Garbage Classification\\export\\latest_model.onnx"
+        }
+    }
+}

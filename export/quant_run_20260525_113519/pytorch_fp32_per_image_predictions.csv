@@ -1,0 +1,93 @@
+﻿index,backend,image_path,true_idx,true_class,pred_idx,pred_class,confidence,correct,latency_ms
+0,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\Residual (10)_crop.jpg,0,其他,0,其他,0.9998347759246826,1,32.964399999400484
+1,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\Residual (26)_crop.jpg,0,其他,0,其他,0.9993815422058105,1,14.86270000168588
+2,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\Residual (38)_crop.jpg,0,其他,0,其他,0.9999338388442993,1,15.543299999990268
+3,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\Residual (65)_crop.jpg,0,其他,0,其他,0.999727189540863,1,14.86519999889424
+4,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\others.500_crop.jpg,0,其他,0,其他,0.9999501705169678,1,13.974600000437931
+5,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\others.606_crop.jpg,0,其他,0,其他,0.9999997615814209,1,13.47660000101314
+6,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\others.607_crop.jpg,0,其他,0,其他,0.9999939203262329,1,12.97100000010687
+7,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0010.jpg,0,其他,0,其他,0.9985587000846863,1,19.532000000253902
+8,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0099.jpg,0,其他,0,其他,0.9999997615814209,1,18.33020000049146
+9,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0155.jpg,0,其他,0,其他,0.9999997615814209,1,16.38000000093598
+10,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0163.jpg,0,其他,0,其他,0.9999911785125732,1,18.912400000772323
+11,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0184.jpg,0,其他,0,其他,0.9999998807907104,1,15.446600000359467
+12,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0204.jpg,0,其他,0,其他,0.9999990463256836,1,14.371100000062142
+13,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0210.jpg,0,其他,0,其他,0.9999985694885254,1,16.23470000049565
+14,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0223.jpg,0,其他,0,其他,0.9998255372047424,1,12.824599998566555
+15,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0228.jpg,0,其他,0,其他,0.9999161958694458,1,12.431600000127219
+16,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0231.jpg,0,其他,0,其他,0.9999973773956299,1,12.623000000530737
+17,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0319.jpg,0,其他,0,其他,0.9997294545173645,1,12.713300000541494
+18,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0347.jpg,0,其他,0,其他,0.8818376660346985,1,12.316999998802203
+19,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\其他\其他_0349.jpg,0,其他,0,其他,0.9680739641189575,1,13.134699998772703
+20,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\Kitchen_20251223_154959_0_crop.jpg,1,厨余,1,厨余,0.999995231628418,1,14.34259999950882
+21,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\Kitchen_20251223_155009_2_crop.jpg,1,厨余,1,厨余,0.9999587535858154,1,13.367300000027171
+22,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\Kitchen_20251223_162327_65_crop.jpg,1,厨余,1,厨余,0.9991031885147095,1,13.526599999750033
+23,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\Kitchen_20251223_162428_82_crop.jpg,1,厨余,1,厨余,0.9999885559082031,1,13.276599998789607
+24,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\kitchen.104_crop.jpg,1,厨余,1,厨余,0.9801409840583801,1,13.330499999938183
+25,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\kitchen.117_crop.jpg,1,厨余,1,厨余,0.9999529123306274,1,11.387099999410566
+26,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\kitchen.119_crop.jpg,1,厨余,1,厨余,0.9999909400939941,1,12.011499999061925
+27,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0014.jpg,1,厨余,1,厨余,0.9998559951782227,1,14.739899999767658
+28,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0041.jpg,1,厨余,1,厨余,0.9999721050262451,1,12.645400000110385
+29,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0062.jpg,1,厨余,1,厨余,0.9999939203262329,1,13.049099999989267
+30,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0084.jpg,1,厨余,1,厨余,0.9999837875366211,1,13.360900000407128
+31,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0117.jpg,1,厨余,1,厨余,0.9999464750289917,1,13.092900000629015
+32,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0148.jpg,1,厨余,1,厨余,0.9999973773956299,1,11.714799999026582
+33,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0152.jpg,1,厨余,1,厨余,0.9999761581420898,1,12.330999999903725
+34,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0160.jpg,1,厨余,1,厨余,0.999976396560669,1,12.851100000261795
+35,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0179.jpg,1,厨余,1,厨余,0.9999938011169434,1,17.046400000253925
+36,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0190.jpg,1,厨余,1,厨余,0.9999897480010986,1,13.706800000363728
+37,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0195.jpg,1,厨余,1,厨余,0.9999972581863403,1,14.381099999809521
+38,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0248.jpg,1,厨余,1,厨余,0.9999579191207886,1,12.953099998412654
+39,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\厨余\厨余_0252.jpg,1,厨余,1,厨余,0.9999998807907104,1,11.936599999899045
+40,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recoverable (26)_crop.jpg,2,可回收,2,可回收,0.9999815225601196,1,13.023700001213001
+41,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_145845_47_crop.jpg,2,可回收,2,可回收,0.998238205909729,1,12.203599999338621
+42,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_145850_48_crop.jpg,2,可回收,2,可回收,0.9999454021453857,1,12.00550000066869
+43,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_150957_55_crop.jpg,2,可回收,2,可回收,0.946121335029602,1,11.794300000474323
+44,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151028_63_crop.jpg,2,可回收,2,可回收,0.9999011754989624,1,13.355199998841272
+45,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151102_75_crop.jpg,2,可回收,2,可回收,0.9999070167541504,1,13.365900000280817
+46,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151346_149_crop.jpg,2,可回收,2,可回收,0.998829185962677,1,13.890500000343309
+47,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151527_172_crop.jpg,2,可回收,2,可回收,0.9995229244232178,1,11.276699999143602
+48,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151536_178_crop.jpg,2,可回收,2,可回收,0.9232572317123413,1,11.760400000639493
+49,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclable_20251224_151549_185_crop.jpg,2,可回收,2,可回收,0.9997879862785339,1,12.187100001028739
+50,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclables. (22)_crop.jpg,2,可回收,2,可回收,0.9987871050834656,1,11.86049999887473
+51,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\Recyclables. (23)_crop.jpg,2,可回收,2,可回收,0.9403809309005737,1,13.14520000050834
+52,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0002.jpg,2,可回收,2,可回收,0.9996680021286011,1,16.732099998989725
+53,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0063.jpg,2,可回收,2,可回收,0.999677300453186,1,16.204999999899883
+54,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0098.jpg,2,可回收,2,可回收,0.9997846484184265,1,14.828299999862793
+55,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0111.jpg,2,可回收,2,可回收,0.9855782389640808,1,11.87220000065281
+56,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0129.jpg,2,可回收,2,可回收,0.9995242357254028,1,13.988200000312645
+57,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0136.jpg,2,可回收,2,可回收,0.9963253140449524,1,14.039599998795893
+58,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0154.jpg,2,可回收,2,可回收,0.9739552140235901,1,15.268900000592112
+59,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\可回收\可回收_0175.jpg,2,可回收,2,可回收,0.9998518228530884,1,13.620799998534494
+60,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\Harmful_20251224_150040_5_crop.jpg,3,有害,3,有害,1.0,1,13.85149999987334
+61,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\Harmful_20251224_150202_27_crop.jpg,3,有害,3,有害,0.9999377727508545,1,12.057599999025115
+62,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (157)_crop.jpg,3,有害,3,有害,0.9999961853027344,1,12.284899999940535
+63,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (162)_crop - 复制.jpg,3,有害,3,有害,0.9998242259025574,1,14.519000000291271
+64,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (186)_crop - 复制.jpg,3,有害,3,有害,0.9990239143371582,1,14.294099999460741
+65,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (186)_crop.jpg,3,有害,3,有害,0.9990239143371582,1,12.99500000095577
+66,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\harmful_waste (193)_crop - 复制.jpg,3,有害,3,有害,0.9997878670692444,1,11.92569999875559
+67,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\hazardous (141)_crop.jpg,3,有害,3,有害,0.9999953508377075,1,14.198900000337744
+68,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\hazardous (146)_crop.jpg,3,有害,3,有害,0.9979369640350342,1,12.427399999069166
+69,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\hazardous (147)_crop.jpg,3,有害,3,有害,0.9998506307601929,1,12.697199999820441
+70,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0032.jpg,3,有害,3,有害,0.999915361404419,1,11.844799999380484
+71,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0074.jpg,3,有害,3,有害,0.9999996423721313,1,14.049400000658352
+72,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0082.jpg,3,有害,3,有害,0.9999922513961792,1,13.467700000546756
+73,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0089.jpg,3,有害,3,有害,0.9999940395355225,1,14.351399999213754
+74,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0093.jpg,3,有害,3,有害,0.9999955892562866,1,12.05889999982901
+75,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0100.jpg,3,有害,3,有害,0.9997263550758362,1,13.49599999957718
+76,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0116.jpg,3,有害,3,有害,0.999607503414154,1,12.006699998892145
+77,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0133.jpg,3,有害,3,有害,0.99997878074646,1,13.95060000140802
+78,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0177.jpg,3,有害,3,有害,0.999996542930603,1,12.957500000993605
+79,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0203.jpg,3,有害,3,有害,1.0,1,13.29280000027211
+80,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0260.jpg,3,有害,3,有害,0.9998030066490173,1,11.658000001261826
+81,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0292.jpg,3,有害,3,有害,0.9996005892753601,1,11.92799999989802
+82,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0308.jpg,3,有害,3,有害,0.9874792098999023,1,11.912100000699866
+83,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0323.jpg,3,有害,3,有害,0.9999877214431763,1,13.444600001093931
+84,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0333.jpg,3,有害,3,有害,0.9999978542327881,1,13.91180000064196
+85,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0353.jpg,3,有害,3,有害,0.9998255372047424,1,13.808499999868218
+86,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0386.jpg,3,有害,3,有害,0.9999983310699463,1,11.912599999050144
+87,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0398.jpg,3,有害,3,有害,0.9999161958694458,1,13.519199999791454
+88,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0400.jpg,3,有害,3,有害,0.9999728202819824,1,14.477299999271054
+89,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0408.jpg,3,有害,3,有害,0.999946117401123,1,14.338599999973667
+90,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0421.jpg,3,有害,3,有害,0.9971835017204285,1,12.977500000488362
+91,pytorch,D:\ZTT\Garbage Classification\garbage_dataset\test\有害\有害_0454.jpg,3,有害,3,有害,0.9999960660934448,1,12.918600001285085

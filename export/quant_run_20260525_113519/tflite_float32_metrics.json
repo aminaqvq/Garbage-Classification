@@ -1,0 +1,11 @@
+{
+    "backend": "tflite_float32",
+    "accuracy": 1.0,
+    "avg_latency_ms": 6.855603260725689,
+    "num_samples": 92,
+    "classification_report_txt": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_classification_report.txt",
+    "classification_report_json": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_classification_report.json",
+    "confusion_matrix_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_confusion_matrix.csv",
+    "confusion_matrix_png": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_confusion_matrix.png",
+    "per_image_predictions_csv": "D:\\ZTT\\Garbage Classification\\export\\quant_run_20260525_113519\\tflite_float32_per_image_predictions.csv"
+}

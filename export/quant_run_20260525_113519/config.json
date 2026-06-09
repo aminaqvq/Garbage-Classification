@@ -1,0 +1,43 @@
+{
+    "data_dir": "D:\\ZTT\\Garbage Classification\\garbage_dataset",
+    "ckpt": "D:\\ZTT\\Garbage Classification\\outputs\\latest_mobilenetv3_best.pt",
+    "outdir": "D:\\ZTT\\Garbage Classification\\export",
+    "model_name": "auto",
+    "num_classes": "auto",
+    "device": "cpu",
+    "img_size": 224,
+    "resize_size": 256,
+    "eval_preprocess": "resize_center_crop",
+    "normalize": true,
+    "mean": [
+        0.485,
+        0.456,
+        0.406
+    ],
+    "std": [
+        0.229,
+        0.224,
+        0.225
+    ],
+    "rgb": true,
+    "opset": 13,
+    "input_name": "input",
+    "output_name": "output",
+    "onnx_simplify": true,
+    "onnx_dynamic_batch": true,
+    "check_onnx_with_ort": true,
+    "export_tflite_float32": true,
+    "export_tflite_fp16": true,
+    "export_tflite_int8": true,
+    "int8_input_type": "float32",
+    "int8_output_type": "float32",
+    "calib_split": "calibration",
+    "calib_fallback_split": "train",
+    "calib_limit": 500,
+    "test_split": "test",
+    "verify_limit": 0,
+    "overwrite_outdir": false,
+    "save_per_image_predictions": true,
+    "save_confusion_matrix_png": true,
+    "seed": 42
+}
