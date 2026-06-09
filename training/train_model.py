@@ -34,12 +34,13 @@ import matplotlib.pyplot as plt
 #   train/
 #   val/
 #   test/
-DATA_DIR = Path("garbage_dataset")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_ROOT / "garbage_dataset"
 
 
 
 # 输出目录
-OUTPUT_ROOT = Path("outputs")
+OUTPUT_ROOT = PROJECT_ROOT / "outputs"
 
 # 模型选择：small 或 large
 MODEL_NAME = "mobilenet_v3_large"

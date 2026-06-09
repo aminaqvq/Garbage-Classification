@@ -4,7 +4,7 @@
 树莓派上位机：AI 垃圾识别 + 单字符串口控制舵机下位机
 ========================================================
 
-适配的下位机文件：舵机控制.c（保持不改）
+适配的下位机固件：firmware/mcu_servo_char/servo_control.c
 
 下位机串口协议非常简单：
     树莓派只发送 1 个 ASCII 字符，下位机收到后改变 angle_pwm：
@@ -21,16 +21,16 @@
 5. 如果你想更安全地调试，可以使用 --mode manual，在画面中按空格发送当前稳定分类。
 
 推荐运行：
-    python3 rpi_servo_char_control_final.py --mode auto
+    python3 rpi/servo_char_control.py --mode auto
 
 安全调试：
-    python3 rpi_servo_char_control_final.py --mode manual
+    python3 rpi/servo_char_control.py --mode manual
 
 直接测试串口和舵机：
-    python3 rpi_servo_char_control_final.py --test-char R
-    python3 rpi_servo_char_control_final.py --test-char K
-    python3 rpi_servo_char_control_final.py --test-char H
-    python3 rpi_servo_char_control_final.py --test-char O
+    python3 rpi/servo_char_control.py --test-char R
+    python3 rpi/servo_char_control.py --test-char K
+    python3 rpi/servo_char_control.py --test-char H
+    python3 rpi/servo_char_control.py --test-char O
 """
 
 # =========================================================
@@ -134,7 +134,7 @@ CLASS_DISPLAY_NAME = {
     "其他": "其他垃圾",
 }
 
-# 关键：适配 舵机控制.c 的单字符协议
+# 关键：适配 firmware/mcu_servo_char/servo_control.c 的单字符协议
 # 注意厨余是 K，不是 C，因为你的 C 代码里判断的是 ch == 'K'
 CLASS_TO_SERVO_CHAR = {
     "可回收": "R",  # Recyclable
@@ -731,7 +731,7 @@ class ServoCharSortingApp:
         self.model_path = Path(args.model_path).expanduser().resolve() if args.model_path else self.project_root / MODEL_RELATIVE_PATH
         self.mapping_path = Path(args.class_mapping).expanduser().resolve() if args.class_mapping else self.project_root / CLASS_MAPPING_FILENAME
         self.log_dir = self.project_root / "Logs"
-        self.capture_dir = self.project_root / "Captures_ServoChar"
+        self.capture_dir = self.project_root / "Captures_Servo_Char"
         self.csv_path = self.log_dir / "servo_char_rounds.csv"
 
         ensure_dirs(self.log_dir, self.capture_dir)
@@ -824,7 +824,7 @@ class ServoCharSortingApp:
                 "servo_char": servo_char,
                 "tx_hex": hex_str(tx_data),
                 "snapshot_path": snapshot_path,
-                "message": "single-char protocol for 舵机控制.c",
+                "message": "single-char protocol for firmware/mcu_servo_char/servo_control.c",
             })
 
             return True
@@ -1018,7 +1018,7 @@ def parse_args():
         "--baudrate",
         type=int,
         default=BAUDRATE_DEFAULT,
-        help="波特率，必须与 舵机控制.c 一致，默认 9600",
+        help="波特率，必须与 firmware/mcu_servo_char/servo_control.c 一致，默认 9600",
     )
     parser.add_argument(
         "--camera-index",
@@ -1073,7 +1073,7 @@ def main():
     args = parse_args()
 
     # 直接测试模式：只打开串口，发一个 R/H/K/O，然后退出。
-    # 用于确认 舵机控制.c 是否能收到字符并改变舵机角度。
+    # 用于确认 firmware/mcu_servo_char/servo_control.c 是否能收到字符并改变舵机角度。
     if args.test_char:
         project_root = Path(args.project_root).expanduser().resolve()
         log_dir = project_root / "Logs"

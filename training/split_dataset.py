@@ -4,6 +4,7 @@ import random
 import shutil
 import hashlib
 from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 from datetime import datetime
 
 from PIL import Image
@@ -15,10 +16,10 @@ from PIL import Image
 
 # 原始采集数据目录
 # 你的采集程序默认保存到 dataset，所以这里默认就是 dataset
-INPUT_DATASET_DIR = "dataset"
+INPUT_DATASET_DIR = str(PROJECT_ROOT / "dataset")
 
 # 划分后的数据集输出目录
-OUTPUT_DATASET_DIR = "garbage_dataset"
+OUTPUT_DATASET_DIR = str(PROJECT_ROOT / "garbage_dataset")
 
 # 固定四大类，顺序很重要，后续训练和推理也要保持这个顺序
 CLASS_NAMES = ["可回收", "有害", "厨余", "其他"]

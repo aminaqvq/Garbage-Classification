@@ -8,6 +8,7 @@ import warnings
 from pathlib import Path
 from datetime import datetime
 from collections import OrderedDict, Counter
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 from typing import Any, Dict, List, Tuple, Optional
 
 import numpy as np
@@ -1332,6 +1333,9 @@ def main():
     warnings.filterwarnings("ignore", category=UserWarning)
 
     cfg = dict(CONFIG)
+    cfg["data_dir"] = str((PROJECT_ROOT / cfg["data_dir"]).resolve())
+    cfg["ckpt"] = str((PROJECT_ROOT / cfg["ckpt"]).resolve())
+    cfg["outdir"] = str((PROJECT_ROOT / cfg["outdir"]).resolve())
     set_seed(int(cfg.get("seed", 42)))
 
     data_dir = Path(cfg["data_dir"])

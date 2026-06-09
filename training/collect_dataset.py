@@ -4,6 +4,7 @@ import csv
 import re
 import os
 from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 from datetime import datetime
 
 import numpy as np
@@ -18,7 +19,7 @@ from PIL import Image, ImageDraw, ImageFont
 CLASS_NAMES = ["可回收", "有害", "厨余", "其他"]
 
 # 数据集根目录
-DATASET_ROOT = "dataset"
+DATASET_ROOT = str(PROJECT_ROOT / "dataset")
 
 # 摄像头编号
 # 笔记本内置摄像头一般是 0

@@ -43,7 +43,7 @@ sudo sed -i 's/console=serial0,115200 //' /boot/cmdline.txt 2>/dev/null || true
 sudo sed -i 's/console=ttyAMA0,115200 //' /boot/cmdline.txt 2>/dev/null || true
 
 echo "[5/5] 创建必要目录..."
-mkdir -p export Logs Captures_Final
+mkdir -p export Logs Captures_Final Captures_Locked_Trigger Captures_Servo_Char Captures_AI_Test
 
 echo ""
 echo "========== 安装完成 =========="
