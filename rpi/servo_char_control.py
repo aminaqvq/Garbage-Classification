@@ -86,9 +86,9 @@ except ImportError:
 # 2. 默认配置
 # =========================================================
 
-PROJECT_ROOT_DEFAULT = Path("/home/amina/workspaces/Garbage Classification")
+PROJECT_ROOT_DEFAULT = Path(__file__).resolve().parent.parent
 MODEL_RELATIVE_PATH = Path("export/latest_tflite_fp16.tflite")
-CLASS_MAPPING_FILENAME = "class_mapping.json"
+CLASS_MAPPING_FILENAME = "config/class_mapping.json"
 
 SERIAL_PORT_DEFAULT = "/dev/ttyAMA0"
 BAUDRATE_DEFAULT = 9600
@@ -997,7 +997,7 @@ def parse_args():
     parser.add_argument(
         "--project-root",
         default=str(PROJECT_ROOT_DEFAULT),
-        help="项目根目录，默认 /home/amina/workspaces/Garbage Classification",
+        help="项目根目录，默认自动检测项目根目录",
     )
     parser.add_argument(
         "--model-path",
@@ -1007,7 +1007,7 @@ def parse_args():
     parser.add_argument(
         "--class-mapping",
         default=None,
-        help="class_mapping.json 路径。默认使用 <project-root>/class_mapping.json",
+        help="class_mapping.json 路径。默认使用 <project-root>/config/class_mapping.json",
     )
     parser.add_argument(
         "--serial-port",

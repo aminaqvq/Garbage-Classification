@@ -1,0 +1,14 @@
+# PC 端训练依赖
+# pip install -r requirements.txt
+
+torch>=2.0
+torchvision>=0.15
+tensorflow>=2.12
+onnx>=1.14
+onnxruntime>=1.15
+onnxsim>=0.4
+scikit-learn>=1.2
+matplotlib>=3.7
+pillow>=9.0
+opencv-python>=4.8
+numpy>=1.24

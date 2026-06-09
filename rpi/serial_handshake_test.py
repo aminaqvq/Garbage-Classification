@@ -13,7 +13,8 @@ SERIAL_PORT = "/dev/ttyAMA0"
 BAUDRATE = 9600
 TIMEOUT = 0.05
 
-LOG_DIR = Path("logs")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+LOG_DIR = PROJECT_ROOT / "Logs"
 LOG_FILE = LOG_DIR / "serial_handshake_log.csv"
 
 FRAME_HEAD = 0xAA

@@ -34,9 +34,9 @@ except ImportError as exc:
 # 1. 默认配置
 # =========================================================
 
-PROJECT_ROOT = Path("/home/amina/workspaces/Garbage Classification")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL_PATH = PROJECT_ROOT / "export" / "latest_tflite_fp16.tflite"
-DEFAULT_CLASS_MAPPING_PATH = PROJECT_ROOT / "class_mapping.json"
+DEFAULT_CLASS_MAPPING_PATH = PROJECT_ROOT / "config" / "class_mapping.json"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "Logs"
 DEFAULT_CAPTURE_DIR = PROJECT_ROOT / "Captures_Locked_Trigger"
 

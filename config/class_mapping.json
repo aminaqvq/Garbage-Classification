@@ -1,0 +1,15 @@
+{
+    "class_to_idx": {
+        "其他": 0,
+        "厨余": 1,
+        "可回收": 2,
+        "有害": 3
+    },
+    "idx_to_class": {
+        "0": "其他",
+        "1": "厨余",
+        "2": "可回收",
+        "3": "有害"
+    },
+    "note": "Correct class order matching training outputs. 0=其他 1=厨余 2=可回收 3=有害. All scripts and firmware must use this order."
+}

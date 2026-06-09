@@ -55,14 +55,14 @@ except ImportError:
 from pathlib import Path
 
 # 项目根目录，绝对路径
-PROJECT_ROOT = Path("/home/amina/workspaces/Garbage Classification")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 # 模型路径
 MODEL_PATH = PROJECT_ROOT / "export" / "latest_tflite_fp16.tflite"
 
 # 类别映射文件
 # 如果你暂时没有 class_mapping.json，也没关系，脚本会使用默认映射
-CLASS_MAPPING_PATH = PROJECT_ROOT / "class_mapping.json"
+CLASS_MAPPING_PATH = PROJECT_ROOT / "config" / "class_mapping.json"
 
 # 日志和截图目录
 LOG_DIR = PROJECT_ROOT / "Logs"

@@ -12,6 +12,8 @@ build/
 # ==========================================
 # IDE
 # ==========================================
+.codegraph/
+.reasonix/
 .idea/
 .vscode/
 *.swp
@@ -48,7 +50,6 @@ outputs/**/*.tflite
 export/**/*.onnx
 export/**/*.tflite
 export/**/*.pb
-export/**/*.tflite
 export/**/saved_model/
 
 # Keep export root-level model copies
@@ -65,6 +66,7 @@ outputs/*/
 Captures_Final/*
 Captures_Locked_Trigger/*
 Captures_Servo_Char/*
+Captures_AI_Test/*
 
 # ==========================================
 # Logs
