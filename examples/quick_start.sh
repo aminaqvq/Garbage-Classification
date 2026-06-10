@@ -1,23 +1,15 @@
 #!/bin/bash
-# 快速启动脚本
-# 用法：bash examples/quick_start.sh
-
 echo "========== 垃圾分类分拣系统 =========="
-echo ""
-echo "请选择功能："
-echo "1. AI 识别预览（仅摄像头，不控制硬件）"
-echo "2. 串口通信测试（需要连接 52RC）"
-echo "3. 完整分拣系统（需要连接 52RC + 舵机 + 电机）"
-echo "4. 单字符舵机控制（需要连接 52RC）"
-echo "5. 锁定触发版（需要连接 52RC + 超声波）"
-echo ""
-read -p "请输入编号 (1-5): " choice
-
-case $choice in
-    1) cd rpi && python3 ai_preview.py ;;
-    2) cd rpi && python3 serial_handshake_test.py ;;
-    3) cd rpi && python3 final_sorting_system.py ;;
-    4) cd rpi && python3 servo_char_control.py ;;
-    5) cd rpi && python3 locked_trigger_system.py ;;
-    *) echo "无效选择" ;;
+echo "1. AI 识别预览"
+echo "2. RKHO 串口手动测试"
+echo "3. 最终完整系统（超声波+满载+AI+RKHO）"
+echo "4. 旧 AA55 协议参考"
+read -p "选择 (1-4): " c
+D="$(dirname "$0")/../Garbage_Classification_Organized"
+case $c in
+  1) cd "$D/05_RPi_AI_Preview" && python3 rpi_ai_preview_camera.py ;;
+  2) cd "$D/06_RKHO_Serial_Protocol_Test" && python3 rpi_manual_rkho_protocol_test.py ;;
+  3) cd "$D/10_Final_Integrated_System" && python3 rpi_final_ai_sorting_with_full_load.py ;;
+  4) cd "$D/08_AA55_Ultrasonic_Protocol_Reference" && python3 rpi_aa55_serial_handshake_test_old.py ;;
+  *) echo "无效" ;;
 esac
