@@ -4,7 +4,7 @@
 树莓派上位机：AI 垃圾识别 + 单字符串口控制舵机下位机
 ========================================================
 
-适配的下位机固件：firmware/mcu_servo_char/servo_control.c
+适配的下位机固件：firmware/mcu_full/main.c
 
 下位机串口协议非常简单：
     树莓派只发送 1 个 ASCII 字符，下位机收到后改变 angle_pwm：
@@ -134,7 +134,7 @@ CLASS_DISPLAY_NAME = {
     "其他": "其他垃圾",
 }
 
-# 关键：适配 firmware/mcu_servo_char/servo_control.c 的单字符协议
+# 关键：适配 firmware/mcu_full/main.c 的单字符协议
 # 注意厨余是 K，不是 C，因为你的 C 代码里判断的是 ch == 'K'
 CLASS_TO_SERVO_CHAR = {
     "可回收": "R",  # Recyclable
@@ -216,7 +216,7 @@ def setup_logger(log_dir: Path) -> logging.Logger:
     logger.addHandler(console)
     logger.addHandler(file_handler)
 
-    logger.info("上位机启动：AI + 单字符舵机控制协议")
+    logger.info("上位机启动：AI + 单字符舵机控制协议 + 满载保护")
     logger.info("TFLite 后端: %s", TFLITE_BACKEND)
 
     return logger
@@ -226,7 +226,7 @@ def append_csv(csv_path: Path, row: Dict) -> None:
     ensure_dirs(csv_path.parent)
     exists = csv_path.exists()
 
-    fieldnames = [
+CSV_FIELDNAMES = [
         "time",
         "round_id",
         "mode",
@@ -239,15 +239,20 @@ def append_csv(csv_path: Path, row: Dict) -> None:
         "is_stable",
         "servo_char",
         "tx_hex",
+        "rx_hex",
+        "mcu_event",
+        "system_state",
         "snapshot_path",
+        "message",
+    ]
         "message",
     ]
 
     with open(csv_path, "a", newline="", encoding="utf-8-sig") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES)
         if not exists:
             writer.writeheader()
-        writer.writerow({key: row.get(key, "") for key in fieldnames})
+        writer.writerow({key: row.get(key, "") for key in CSV_FIELDNAMES})
 
 
 # =========================================================
@@ -673,6 +678,18 @@ class ServoCharSerial:
             raise ValueError(f"未知分类，无法映射为 R/H/K/O: {raw_class}")
         return self.send_char(CLASS_TO_SERVO_CHAR[raw_class])
 
+    def read_available(self) -> bytes:
+        if self.ser is None or not self.ser.is_open:
+            return b""
+        try:
+            n = self.ser.in_waiting
+            if n > 0:
+                data = self.ser.read(n)
+                self.logger.info("串口 RX %d 字节: %s", n, hex_str(data))
+                return data
+        except Exception as exc:
+            self.logger.debug("串口读取异常: %s", exc)
+        return b""
     def close(self) -> None:
         if self.ser is not None and self.ser.is_open:
             self.ser.close()
@@ -740,7 +757,7 @@ class ServoCharSortingApp:
         self.logger.info("PROJECT_ROOT: %s", self.project_root)
         self.logger.info("MODEL_PATH: %s", self.model_path)
         self.logger.info("CLASS_MAPPING: %s", self.mapping_path)
-        self.logger.info("串口协议: 单字符 R/H/K/O，不等待 ACK/DONE")
+        self.logger.info("串口协议: 单字符 R/H/K/O + 满载反馈 F/N")
         self.logger.info("运行模式: %s", self.args.mode)
 
         idx_to_class = load_idx_to_class(self.mapping_path, self.logger)
@@ -750,6 +767,12 @@ class ServoCharSortingApp:
         self.serial_mgr = ServoCharSerial(args.serial_port, args.baudrate, self.logger)
         self.camera_mgr = CameraManager(args.camera_index, self.logger)
 
+
+        self.paused_by_full = False
+        self.full_message = ""
+        self.last_mcu_rx_text = "未收到"
+        self.full_since_time = None
+        self.awaiting_manual_resume = False
         self.running = True
         self.round_id = 0
         self.last_send_time = 0.0
@@ -790,7 +813,86 @@ class ServoCharSortingApp:
         self.logger.info("保存截图: %s", path)
         return str(path)
 
+
+    def system_state_str(self) -> str:
+        if self.paused_by_full:
+            return "FULL-PAUSED"
+        if self.awaiting_manual_resume:
+            return "AWAITING-MANUAL-RESUME"
+        return "NORMAL"
+
+    def process_mcu_events(self) -> None:
+        data = self.serial_mgr.read_available()
+        if not data:
+            return
+        for byte_val in data:
+            ch = chr(byte_val)
+            if ch == 'F':
+                if not self.paused_by_full:
+                    self.paused_by_full = True
+                    self.awaiting_manual_resume = False
+                    self.full_message = "垃圾桶已满，分类已暂停，请清理"
+                    self.full_since_time = time.time()
+                    self.last_mcu_rx_text = f"RX 'F' / 0x{byte_val:02X}"
+                    self.serial_text = self.last_mcu_rx_text
+                    self.status_text = self.full_message
+                    self.stable_predictor.reset()
+                    self.logger.warning("[MCU] 收到 F，暂停自动分类")
+                    append_csv(self.csv_path, {
+                        "time": now_str(), "round_id": self.round_id,
+                        "mode": self.args.mode, "event": "mcu_full",
+                        "rx_hex": hex_str(bytes([byte_val])),
+                        "mcu_event": "FULL", "system_state": self.system_state_str(),
+                        "message": "下位机F，垃圾桶满载，分类已暂停",
+                    })
+            elif ch == 'N':
+                self.last_mcu_rx_text = f"RX 'N' / 0x{byte_val:02X}"
+                self.logger.info("[MCU] 收到 N（恢复正常）")
+                if self.args.auto_resume_after_clear:
+                    self.paused_by_full = False
+                    self.awaiting_manual_resume = False
+                    self.full_message = ""
+                    self.full_since_time = None
+                    self.status_text = "满载已解除，分类已自动恢复"
+                    self.serial_text = self.last_mcu_rx_text
+                    self.stable_predictor.reset()
+                    self.logger.info("[MCU] 自动恢复分类")
+                    append_csv(self.csv_path, {
+                        "time": now_str(), "round_id": self.round_id,
+                        "mode": self.args.mode, "event": "mcu_normal_auto_resume",
+                        "rx_hex": hex_str(bytes([byte_val])),
+                        "mcu_event": "NORMAL", "system_state": self.system_state_str(),
+                        "message": "下位机N，已自动恢复分类",
+                    })
+                else:
+                    self.awaiting_manual_resume = True
+                    self.status_text = "满载已解除，按 c 继续分类"
+                    self.serial_text = self.last_mcu_rx_text
+                    self.logger.info("[MCU] 收到 N，等待用户按 c 手动恢复")
+                    append_csv(self.csv_path, {
+                        "time": now_str(), "round_id": self.round_id,
+                        "mode": self.args.mode, "event": "mcu_normal_awaiting_manual",
+                        "rx_hex": hex_str(bytes([byte_val])),
+                        "mcu_event": "NORMAL", "system_state": self.system_state_str(),
+                        "message": "下位机N，等待用户按c手动恢复",
+                    })
     def send_result_to_mcu(self, result: Dict, event: str, frame_for_snapshot: Optional[np.ndarray] = None) -> bool:
+        if self.paused_by_full and not getattr(self.args, 'allow_send_while_full', False):
+            self.logger.warning("满载暂停，禁止发送分类命令")
+            self.serial_text = "满载暂停，禁止发送"
+            append_csv(self.csv_path, {
+                "time": now_str(), "round_id": self.round_id,
+                "mode": self.args.mode, "event": "send_blocked_full",
+                "raw_class": result.get("raw_class"),
+                "display_class": result.get("display_class"),
+                "system_state": self.system_state_str(),
+                "message": "满载暂停保护：禁止发送R/H/K/O",
+            })
+            return False
+        if self.awaiting_manual_resume and not getattr(self.args, 'allow_send_while_full', False):
+            self.logger.warning("等待手动恢复，禁止发送分类命令")
+            self.serial_text = "等待手动恢复，禁止发送"
+            return False
         raw_class = result["raw_class"]
         servo_char = CLASS_TO_SERVO_CHAR.get(raw_class)
 
@@ -824,7 +926,8 @@ class ServoCharSortingApp:
                 "servo_char": servo_char,
                 "tx_hex": hex_str(tx_data),
                 "snapshot_path": snapshot_path,
-                "message": "single-char protocol for firmware/mcu_servo_char/servo_control.c",
+                "system_state": self.system_state_str(),
+                "message": "single-char protocol for firmware/mcu_full/main.c",
             })
 
             return True
@@ -853,6 +956,8 @@ class ServoCharSortingApp:
         if self.latest_result is None:
             return False
 
+        if self.paused_by_full or self.awaiting_manual_resume:
+            return False
         now = time.time()
         return (now - self.last_send_time) >= self.args.send_cooldown
 
@@ -862,6 +967,42 @@ class ServoCharSortingApp:
 
         if key == ord("q"):
             self.running = False
+        if key == ord("c"):
+            if self.paused_by_full or self.awaiting_manual_resume:
+                self.paused_by_full = False
+                self.awaiting_manual_resume = False
+                self.full_message = ""
+                self.full_since_time = None
+                self.status_text = "用户手动恢复分类"
+                self.serial_text = self.last_mcu_rx_text
+                self.stable_predictor.reset()
+                self.logger.info("用户按c手动恢复分类")
+                append_csv(self.csv_path, {
+                    "time": now_str(), "round_id": self.round_id,
+                    "mode": self.args.mode, "event": "user_manual_resume",
+                    "system_state": self.system_state_str(),
+                    "message": "用户按c手动恢复分类",
+                })
+            return
+        if key == ord("p"):
+            if self.paused_by_full:
+                self.logger.info("当前为满载暂停，无法用p键切换")
+                return
+            if not hasattr(self, '_manual_paused'):
+                self._manual_paused = False
+            self._manual_paused = not self._manual_paused
+            if self._manual_paused:
+                self.status_text = "用户手动暂停"
+            else:
+                self.status_text = "已恢复"
+                self.stable_predictor.reset()
+            return
+        if self.paused_by_full:
+            self.logger.info("当前为满载暂停状态，禁止发送分类命令")
+            return
+        if self.awaiting_manual_resume:
+            self.logger.info("等待手动恢复分类，请按c")
+            return
             return
 
         if key == ord("s") and self.latest_show_frame is not None:
@@ -916,12 +1057,33 @@ class ServoCharSortingApp:
 
         try:
             while self.running:
+                self.process_mcu_events()
                 frame = self.camera_mgr.read()
                 self.update_fps()
 
                 roi_box = get_center_roi(frame)
                 x1, y1, x2, y2 = roi_box
                 roi = frame[y1:y2, x1:x2]
+                if self.paused_by_full or self.awaiting_manual_resume:
+                    self.update_fps()
+                    roi_box = get_center_roi(frame)
+                    s = "FULL-PAUSED" if self.paused_by_full else "AWAITING-RESUME"
+                    show = draw_overlay(
+                        frame_bgr=frame, roi_box=roi_box,
+                        status_text=self.status_text,
+                        class_text="-", conf_text="-", stable_text="0",
+                        serial_text=self.serial_text,
+                        mode_text=f"{self.args.mode}, {s}",
+                        round_text=str(self.round_id),
+                        fps_text=f"{self.fps:.1f}",
+                    )
+                    self.latest_show_frame = show
+                    if not self.args.no_window:
+                        cv2.imshow(WINDOW_NAME, show)
+                        key = cv2.waitKey(1) & 0xFF
+                        self.handle_key(key)
+                    time.sleep(FRAME_INTERVAL_SEC)
+                    continue
 
                 result = self.classifier.predict(roi)
                 stable_info = self.stable_predictor.update(result)
@@ -1018,7 +1180,7 @@ def parse_args():
         "--baudrate",
         type=int,
         default=BAUDRATE_DEFAULT,
-        help="波特率，必须与 firmware/mcu_servo_char/servo_control.c 一致，默认 9600",
+        help="波特率，必须与 firmware/mcu_full/main.c 一致，默认 9600",
     )
     parser.add_argument(
         "--camera-index",
@@ -1062,6 +1224,18 @@ def parse_args():
         help="只发送一个测试字符后退出。例如 --test-char R / K / H / O",
     )
 
+    parser.add_argument(
+        "--auto-resume-after-clear",
+        action="store_true",
+        default=False,
+        help="满载解除后自动恢复分类。默认不自动，需按c键手动恢复",
+    )
+    parser.add_argument(
+        "--allow-send-while-full",
+        action="store_true",
+        default=False,
+        help="[调试用] 满载时仍允许发送分类命令。默认禁止。",
+    )
     return parser.parse_args()
 
 
@@ -1073,7 +1247,7 @@ def main():
     args = parse_args()
 
     # 直接测试模式：只打开串口，发一个 R/H/K/O，然后退出。
-    # 用于确认 firmware/mcu_servo_char/servo_control.c 是否能收到字符并改变舵机角度。
+    # 用于确认 firmware/mcu_full/main.c 是否能收到字符并改变舵机角度。
     if args.test_char:
         project_root = Path(args.project_root).expanduser().resolve()
         log_dir = project_root / "Logs"
