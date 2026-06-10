@@ -79,3 +79,4 @@ Logs/*
 # ==========================================
 dataset/capture_log.csv
 garbage_dataset/logs/
+Garbage_Classification_Organized_before_rkho_full_load_fix/
