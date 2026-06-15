@@ -86,8 +86,8 @@ except ImportError:
 # 2. 默认配置
 # =========================================================
 
-PROJECT_ROOT_DEFAULT = Path(__file__).resolve().parent.parent
-MODEL_RELATIVE_PATH = Path("export/latest_tflite_fp16.tflite")
+PROJECT_ROOT_DEFAULT = Path(__file__).resolve().parents[2]
+MODEL_RELATIVE_PATH = Path("export") / "latest_tflite_fp16.tflite"
 CLASS_MAPPING_FILENAME = "config/class_mapping.json"
 
 SERIAL_PORT_DEFAULT = "/dev/ttyAMA0"
@@ -226,7 +226,7 @@ def append_csv(csv_path: Path, row: Dict) -> None:
     ensure_dirs(csv_path.parent)
     exists = csv_path.exists()
 
-CSV_FIELDNAMES = [
+    CSV_FIELDNAMES = [
         "time",
         "round_id",
         "mode",
@@ -243,8 +243,6 @@ CSV_FIELDNAMES = [
         "mcu_event",
         "system_state",
         "snapshot_path",
-        "message",
-    ]
         "message",
     ]
 
