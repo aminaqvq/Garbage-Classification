@@ -1,17 +1,24 @@
-# 02 — 数据集划分
+# 02 — 五分类数据集划分
 
-## 1. 用途
-将 dataset/ 按 7:2:1 划分为 train/val/test 放入 garbage_dataset/。
+## 脚本
 
-## 2. 脚本
+`dataset_split_train_val_test.py` — 将采集好的五分类图像按比例划分为 train/val/test。
 
-| 文件名 | 类型 | 作用 |
-|--------|------|------|
-| `dataset_split_train_val_test.py` | PC Python | 数据划分 |
+## 输出
 
-## 3. 运行
+- `garbage_dataset/class_names.json`
+- `garbage_dataset/class_mapping.json`
+- `garbage_dataset/split_summary.json`
+
+## 运行
+
 ```bash
+python dataset_split_train_val_test.py --dry-run
 python dataset_split_train_val_test.py
 ```
 
-输入: `dataset/` → 输出: `garbage_dataset/train|val|test/`
+## 配置
+
+- 类别映射: `09_Vision_Trigger_5Class_System/config/class_mapping_5class.json`
+- 输入: `dataset/`
+- 输出: `garbage_dataset/`

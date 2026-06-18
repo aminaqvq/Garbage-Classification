@@ -1,30 +1,17 @@
-# 串口协议汇总
+# 串口协议总结（五分类视觉触发版）
 
-波特率: 9600bps, 8N1
+## 最终协议: ASCII RKHO + D/F/N/E（无 T）
 
-## 最终协议：ASCII RKHO + T/F/N/D/E ★
+RPi→MCU: R(可回收) K(厨余) H(有害) O(其他)
+MCU→RPi: D(完成) F(满载) N(恢复) E(错误)
 
-| 方向 | 字符 | 含义 |
-|------|------|------|
-| MCU→RPi | T | 超声波触发 |
-| MCU→RPi | F | 满载暂停 |
-| MCU→RPi | N | 满载解除 |
-| MCU→RPi | D | 分拣完成 |
-| MCU→RPi | E | 错误/超时 |
-| RPi→MCU | R | 可回收 |
-| RPi→MCU | K | 厨余 |
-| RPi→MCU | H | 有害 |
-| RPi→MCU | O | 其他 |
+T 触发字符已在新版中彻底移除（仅作为 [legacy] 在 06 调试工具中显示）。
 
-**使用**: `10_Final_Integrated_System/`
+## 使用
 
-## 旧协议：AA xx 55 字节帧（不再使用）
+**最终部署**: `09_Vision_Trigger_5Class_System/`
+- RPi: `rpi/rpi_vision_trigger_sorting.py`
+- MCU: `mcu/mcu_vision_trigger_full_load_rkho.c`
 
-| 方向 | 数据 | 含义 |
-|------|------|------|
-| MCU→RPi | 0xA1 | 检测到物体 |
-| RPi→MCU | AA 01/02/03/04 55 | 分类 |
-| MCU→RPi | 0xCC | ACK |
-| MCU→RPi | 0xDD | DONE |
-
-**已移至**: `08_AA55_Ultrasonic_Protocol_Reference/`
+调试工具: `06_RKHO_Serial_Protocol_Test/`
+- T 标注为 [legacy]，不是当前协议

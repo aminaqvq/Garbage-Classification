@@ -1,0 +1,36 @@
+{
+  "model": {
+    "path": "models/vision_trigger_5class_tflite/latest_tflite_float32.tflite",
+    "input_size": 224,
+    "backend": "tflite"
+  },
+  "camera": {
+    "device_index": 0,
+    "width": 640,
+    "height": 480,
+    "roi_enabled": false,
+    "roi": {
+      "x": 0,
+      "y": 0,
+      "w": 640,
+      "h": 480
+    }
+  },
+  "decision": {
+    "confidence_threshold": 0.82,
+    "stable_frames_required": 5,
+    "return_to_pending_frames_required": 8,
+    "send_cooldown_seconds": 3.0,
+    "done_timeout_seconds": 8.0
+  },
+  "serial": {
+    "port": "/dev/ttyUSB0",
+    "baudrate": 9600,
+    "timeout_seconds": 0.1
+  },
+  "safety": {
+    "pause_on_full": true,
+    "require_return_to_pending_before_next_sort": true,
+    "ignore_pending_class_for_sorting": true
+  }
+}

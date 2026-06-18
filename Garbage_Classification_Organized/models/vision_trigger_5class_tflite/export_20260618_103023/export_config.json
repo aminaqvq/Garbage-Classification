@@ -1,0 +1,25 @@
+{
+    "model_type": "mobilenet_v3_small",
+    "num_classes": 5,
+    "class_names": [
+        "待分拣",
+        "其他",
+        "厨余",
+        "可回收",
+        "有害"
+    ],
+    "image_size": 224,
+    "normalize": {
+        "mean": [
+            0.485,
+            0.456,
+            0.406
+        ],
+        "std": [
+            0.229,
+            0.224,
+            0.225
+        ]
+    },
+    "pytorch_ckpt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\latest_mobilenetv3_best.pt"
+}

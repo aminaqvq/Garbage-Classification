@@ -80,3 +80,29 @@ Logs/*
 dataset/capture_log.csv
 garbage_dataset/logs/
 Garbage_Classification_Organized_before_rkho_full_load_fix/
+
+# ==========================================
+# Organized Path — Dataset Images (large binary)
+# ==========================================
+Garbage_Classification_Organized/dataset/**/*.jpg
+Garbage_Classification_Organized/dataset/**/*.jpeg
+Garbage_Classification_Organized/dataset/**/*.png
+Garbage_Classification_Organized/dataset/**/*.bmp
+Garbage_Classification_Organized/dataset/**/*.webp
+Garbage_Classification_Organized/garbage_dataset/train/**/*
+Garbage_Classification_Organized/garbage_dataset/val/**/*
+Garbage_Classification_Organized/garbage_dataset/test/**/*
+
+# Keep dataset directory structure
+!Garbage_Classification_Organized/dataset/**/
+!Garbage_Classification_Organized/garbage_dataset/**/
+
+# ==========================================
+# Organized Path — Model Checkpoints
+# ==========================================
+Garbage_Classification_Organized/models/**/*.pt
+Garbage_Classification_Organized/models/**/*.pth
+Garbage_Classification_Organized/models/**/*.onnx
+Garbage_Classification_Organized/models/**/*.tflite
+Garbage_Classification_Organized/models/**/*.pb
+Garbage_Classification_Organized/models/**/saved_model/

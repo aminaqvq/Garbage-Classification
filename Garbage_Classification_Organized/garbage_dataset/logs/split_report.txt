@@ -1,0 +1,48 @@
+========== 垃圾分类数据集划分报告 ==========
+生成时间：2026-06-17 21:38:20
+原始数据目录：D:\Garbage Classification\Garbage_Classification_Organized\dataset
+输出数据目录：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset
+文件操作模式：copy
+随机种子：42
+
+划分比例：
+train：0.7
+val：0.15
+test：0.15
+
+类别顺序：
+0: 待分拣
+1: 其他
+2: 厨余
+3: 可回收
+4: 有害
+
+每类划分数量：
+待分拣：总数 521，train 364，val 78，test 79
+其他：总数 465，train 325，val 69，test 71
+厨余：总数 280，train 196，val 42，test 42
+可回收：总数 279，train 195，val 41，test 43
+有害：总数 567，train 396，val 85，test 86
+
+整体数量：
+总有效图片：2112
+train 总数：1476
+val 总数：315
+test 总数：321
+无效图片数量：0
+
+日志文件：
+split_files_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\split_files.csv
+split_summary_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\split_summary.csv
+invalid_images_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\invalid_images.csv
+split_summary_json：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\split_summary.json
+split_report_txt：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\split_report.txt
+class_mapping_json：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\class_mapping.json
+
+说明：
+1. split_files.csv 记录每张有效图片被分到哪里。
+2. invalid_images.csv 记录损坏图片或无法读取的图片。
+3. split_summary.csv 记录每个类别的 train/val/test 数量。
+4. class_names.json 保存类别顺序，训练和推理时必须保持一致。
+5. class_mapping.json 是完整的五分类映射配置副本（含 serial_protocol、notes）。
+6. split_summary.json 是完整的划分元数据。

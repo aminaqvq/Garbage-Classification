@@ -1,17 +1,21 @@
-# 04 — 模型量化导出
+# 04 — TFLite 模型导出与量化
 
-## 1. 用途
-.pt → ONNX → TFLite (FP32/FP16/INT8) 量化导出。
+## 脚本
 
-## 2. 脚本
+`model_export_tflite.py` — PyTorch → ONNX → TFLite 导出 + float16/int8 量化。
 
-| 文件名 | 类型 | 作用 |
-|--------|------|------|
-| `model_export_tflite.py` | PC Python | 量化导出 |
+## 运行
 
-## 3. 运行
 ```bash
-python model_export_tflite.py
+# 预检
+python model_export_tflite.py --model-path models/vision_trigger_5class_mobilenetv3/latest_mobilenetv3_best.pt --output-dir models/vision_trigger_5class_tflite --class-config 09_Vision_Trigger_5Class_System/config/class_mapping_5class.json --data-dir garbage_dataset --num-classes auto --dry-run
+
+# 导出 + float16 + 验证
+python model_export_tflite.py --model-path models/vision_trigger_5class_mobilenetv3/latest_mobilenetv3_best.pt --output-dir models/vision_trigger_5class_tflite --class-config 09_Vision_Trigger_5Class_System/config/class_mapping_5class.json --data-dir garbage_dataset --num-classes auto --quantize-float16 --verify --verify-samples 100
 ```
 
-输出: `export/latest_tflite_fp16.tflite` (推荐树莓派使用)
+## 输出
+
+- `latest_tflite_float32.tflite`
+- `export_<timestamp>/` 详细导出结果
+- `saved_model/model_float32_simplified_float16.tflite`

@@ -1,6 +1,0 @@
-﻿name,path,size_mb
-onnx_original,D:\ZTT\Garbage Classification\export\quant_run_20260525_113519\model.onnx,16.044584274291992
-onnx_final,D:\ZTT\Garbage Classification\export\quant_run_20260525_113519\model_simplified.onnx,16.05832004547119
-tflite_float32,D:\ZTT\Garbage Classification\export\quant_run_20260525_113519\model_float32.tflite,16.056865692138672
-tflite_fp16,D:\ZTT\Garbage Classification\export\quant_run_20260525_113519\model_fp16.tflite,8.075664520263672
-tflite_int8,D:\ZTT\Garbage Classification\export\quant_run_20260525_113519\model_int8.tflite,4.5423431396484375

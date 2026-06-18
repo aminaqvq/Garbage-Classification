@@ -1,20 +1,16 @@
-# 硬件接线汇总
+# 最终接线说明（五分类视觉触发版）
 
-## 最终接线(10_Final_Integrated_System)
+详细接线说明见 `09_Vision_Trigger_5Class_System/wiring_vision_trigger.md`。
 
-### 树莓派↔52RC UART
-RPi TXD(GPIO14)→MCU RXD(P3.0), RPi RXD(GPIO15)←MCU TXD(P3.1), GND↔GND
-⚠ 3.3V vs 5V 需电平转换
+## 核心连接
 
-### MCU 外设
-| 外设 | 引脚 |
-|------|------|
-| HC-SR04 TRIG/ECHO | P1^0/P1^1 |
-| 舵机 | P1^5 |
-| 电机 EN/IN1/IN2 | P0^0/P0^1/P0^2 |
-| 满载 L0/L1/L2/L3 | P0^3/P0^5/P0^6/P0^7 |
-| LED 可回收/厨余/有害/其他 | P2^0/P2^1/P2^2/P2^3 |
-| LED 检测 | P2^4 |
+- 树莓派 UART → STC89C52RC（电平转换，3.3V↔5V）
+- 舵机 → P1^5（独立供电）
+- 电机 → P0^0/P0^1/P0^2（独立供电，P0 外部上拉）
+- 满载传感器 L0-L3 → P0^3/P0^5/P0^6/P0^7（P0 外部上拉）
+- 各模块 GND 共地
 
-⚠ P0口开漏,需外部上拉。舵机/电机独立供电,所有GND共地。
-TODO: 满载传感器具体型号需人工确认。
+## 已移除
+
+- HC-SR04 超声波传感器
+- TRIG/ECHO 引脚接线

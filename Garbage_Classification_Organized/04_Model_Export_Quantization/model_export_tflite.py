@@ -1,15 +1,19 @@
 import os
+import sys
 import csv
 import json
 import time
 import shutil
+import random
+import argparse
 import logging
 import warnings
 from pathlib import Path
 from datetime import datetime
 from collections import OrderedDict, Counter
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 from typing import Any, Dict, List, Tuple, Optional
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 import numpy as np
 from PIL import Image
@@ -20,99 +24,150 @@ import torch
 import torch.nn as nn
 from torchvision import models
 
-import onnx
-import onnxruntime as ort
-from onnxsim import simplify
+# Truly lazy imports — never executed at module level, only when accessed
+_ONNX_AVAILABLE = False
+_ONNXRT_AVAILABLE = False
+_ONNXSIM_AVAILABLE = False
+_TF_AVAILABLE = False
 
-import tensorflow as tf
+class _DummyModule:
+    def __getattr__(self, name):
+        return _DummyModule()
+    def __call__(self, *args, **kwargs):
+        return _DummyModule()
 
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+_dummy = _DummyModule()
+onnx = _dummy
+ort = _dummy
+simplify = _dummy
+tf = _dummy
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+def _lazy_import_onnx():
+    global onnx, _ONNX_AVAILABLE
+    if _ONNX_AVAILABLE: return
+    try:
+        import onnx as _m
+        onnx = _m; _ONNX_AVAILABLE = True
+    except Exception: pass
+
+def _lazy_import_ort():
+    global ort, _ONNXRT_AVAILABLE
+    if _ONNXRT_AVAILABLE: return
+    try:
+        import onnxruntime as _m
+        ort = _m; _ONNXRT_AVAILABLE = True
+    except Exception: pass
+
+def _lazy_import_onnxsim():
+    global simplify, _ONNXSIM_AVAILABLE
+    if _ONNXSIM_AVAILABLE: return
+    try:
+        from onnxsim import simplify as _f
+        simplify = _f; _ONNXSIM_AVAILABLE = True
+    except Exception: pass
+
+def _lazy_import_tf():
+    global tf, _TF_AVAILABLE
+    if _TF_AVAILABLE: return
+    try:
+        import tensorflow as _m
+        tf = _m; _TF_AVAILABLE = True
+    except Exception: pass
 
 
 # =========================================================
-# 配置区：主要改这里
+# 默认配置（可由命令行参数覆盖）
 # =========================================================
 
 CONFIG: Dict[str, Any] = {
-    # 项目路径
-    # DATA_DIR 下应该有 train / val / test
-    # 如果你生成了 calibration 目录，也会优先使用 calibration
     "data_dir": "garbage_dataset",
-
-    # 训练好的 best 模型
-    # 如果你用的是我前面给你的完整训练脚本，通常是：
-    # outputs/latest_mobilenetv3_best.pt
-    "ckpt": "outputs/latest_mobilenetv3_best.pt",
-
-    # 量化导出目录
-    "outdir": "export",
-
-    # 模型名称：
-    # auto 会优先读取 checkpoint 里的 model_name
-    # 如果读不到，默认 mobilenet_v3_small
-    # 可选：mobilenet_v3_small / mobilenet_v3_large / auto
+    "ckpt": "models/vision_trigger_5class_mobilenetv3/latest_mobilenetv3_best.pt",
+    "outdir": "models/vision_trigger_5class_tflite",
     "model_name": "auto",
-
-    # 类别数：
-    # auto 会优先根据 checkpoint 里的 class_to_idx 判断
     "num_classes": "auto",
-
-    # 设备
-    # 导出和量化建议 cpu；如果只验证 PyTorch 也可以 cuda
     "device": "cpu",
-
-    # 图像预处理
     "img_size": 224,
     "resize_size": 256,
-    "eval_preprocess": "resize_center_crop",  # resize_center_crop / direct_resize
+    "eval_preprocess": "resize_center_crop",
     "normalize": True,
     "mean": [0.485, 0.456, 0.406],
     "std": [0.229, 0.224, 0.225],
     "rgb": True,
-
-    # ONNX 导出
     "opset": 13,
     "input_name": "input",
     "output_name": "output",
     "onnx_simplify": True,
     "onnx_dynamic_batch": True,
     "check_onnx_with_ort": True,
-
-    # TFLite 导出
     "export_tflite_float32": True,
-    "export_tflite_fp16": True,
-    "export_tflite_int8": True,
-
-    # INT8 TFLite 输入输出类型
-    # 推荐默认 float32：模型内部 int8，但输入输出仍然 float32，部署更简单
-    # 如果你要纯 int8 输入输出，可改成 int8
-    "int8_input_type": "float32",   # float32 / int8 / uint8
-    "int8_output_type": "float32",  # float32 / int8 / uint8
-
-    # 校准集
-    # 如果 data_dir/calibration 存在，就使用 calibration
-    # 如果不存在，就用 train
+    "export_tflite_fp16": False,
+    "export_tflite_int8": False,
+    "int8_input_type": "float32",
+    "int8_output_type": "float32",
     "calib_split": "calibration",
     "calib_fallback_split": "train",
     "calib_limit": 500,
-
-    # 测试集评估
     "test_split": "test",
-    # 0 表示测试集全量评估；如果想快速试跑，可以改成 50 或 100
     "verify_limit": 0,
-
-    # 日志与覆盖
     "overwrite_outdir": False,
     "save_per_image_predictions": True,
     "save_confusion_matrix_png": True,
-
-    # 随机种子
     "seed": 42,
+    # v1.6 新增：外部类别配置与验证控制
+    "class_config_path": "",
+    "run_dry_run": False,
+    "run_verify": False,
+    "verify_samples": 0,
+    "batch_size": 1,
+    "quantize_float16": False,
+    "quantize_int8": False,
 }
+
+
+def merge_cli_to_config(args: argparse.Namespace) -> Dict[str, Any]:
+    """将命令行参数合并到 CONFIG 字典中。"""
+    cfg = dict(CONFIG)
+    if getattr(args, "model_path", None):
+        cfg["ckpt"] = str(args.model_path)
+    if getattr(args, "output_dir", None):
+        cfg["outdir"] = str(args.output_dir)
+    if getattr(args, "data_dir", None):
+        cfg["data_dir"] = str(args.data_dir)
+    if getattr(args, "class_config", None):
+        cfg["class_config_path"] = str(args.class_config)
+    if getattr(args, "model_name", None) and str(args.model_name).lower() != "auto":
+        cfg["model_name"] = str(args.model_name).lower()
+    if getattr(args, "num_classes", None):
+        raw = str(args.num_classes)
+        if raw.lower() == "auto":
+            cfg["num_classes"] = "auto"
+        else:
+            cfg["num_classes"] = int(args.num_classes)
+    if getattr(args, "image_size", None):
+        cfg["img_size"] = int(args.image_size)
+    if getattr(args, "batch_size", None):
+        cfg["batch_size"] = int(args.batch_size)
+    if getattr(args, "device", None):
+        d = str(args.device).lower()
+        if d == "auto":
+            cfg["device"] = "cuda" if torch.cuda.is_available() else "cpu"
+        else:
+            cfg["device"] = d
+    if getattr(args, "dry_run", None):
+        cfg["run_dry_run"] = True
+    if getattr(args, "verify", None):
+        cfg["run_verify"] = True
+    if getattr(args, "verify_samples", None):
+        cfg["verify_limit"] = int(args.verify_samples)
+    if getattr(args, "quantize_float16", None):
+        cfg["quantize_float16"] = True
+        cfg["export_tflite_fp16"] = True
+    else:
+        cfg["quantize_float16"] = False
+    if getattr(args, "quantize_int8", None):
+        cfg["quantize_int8"] = True
+        cfg["export_tflite_int8"] = True
+    return cfg
 
 
 IMG_EXTS = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
@@ -153,7 +208,7 @@ def prepare_run_dir(cfg: Dict[str, Any]) -> Path:
     if out_root.exists() and cfg.get("overwrite_outdir", False):
         shutil.rmtree(out_root)
 
-    run_dir = out_root / f"quant_run_{timestamp_str()}"
+    run_dir = out_root / f"export_{timestamp_str()}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
     return run_dir
@@ -208,6 +263,18 @@ def file_size_mb(path: Path) -> float:
 # =========================================================
 # checkpoint 加载
 # =========================================================
+
+def check_export_dependencies(logger: logging.Logger) -> List[str]:
+    """检查导出依赖是否齐全，返回缺失列表。"""
+    missing = []
+    if not _ONNX_AVAILABLE:
+        missing.append("onnx")
+    if not _ONNXRT_AVAILABLE:
+        missing.append("onnxruntime")
+    if not _TF_AVAILABLE:
+        missing.append("tensorflow")
+    return missing
+
 
 def safe_torch_load(path: Path, device: torch.device):
     try:
@@ -441,45 +508,84 @@ def list_samples_from_split(
     data_dir: Path,
     split: str,
     class_to_idx: Dict[str, int],
-    limit: int = 0
+    limit: int = 0,
+    seed: int = 42,
+    balanced: bool = True
 ) -> List[Dict[str, Any]]:
+    """
+    从某个 split 中列出图片样本。
+
+    关键修复：
+    - 原版本在 limit>0 时先把所有路径排序再截断，Windows/中文路径排序会导致
+      verify_samples=100 只覆盖部分类别，验证报告失真。
+    - 新版本默认做分层均衡抽样，尽量让每个类别都参与验证。
+    """
     split_dir = data_dir / split
 
     if not split_dir.exists():
         raise FileNotFoundError(f"找不到数据集 split 目录：{split_dir.resolve()}")
 
-    samples = []
+    rng = random.Random(int(seed))
+    per_class: Dict[str, List[Dict[str, Any]]] = OrderedDict()
 
-    for class_name, class_idx in class_to_idx.items():
+    for class_name, class_idx in sorted(class_to_idx.items(), key=lambda kv: kv[1]):
         class_dir = split_dir / class_name
+        class_samples = []
 
-        if not class_dir.exists():
-            continue
+        if class_dir.exists():
+            image_paths = [
+                p for p in class_dir.rglob("*")
+                if is_image_file(p)
+            ]
+            image_paths.sort()
 
-        image_paths = [
-            p for p in class_dir.rglob("*")
-            if is_image_file(p)
-        ]
+            for p in image_paths:
+                class_samples.append({
+                    "image_path": p,
+                    "label": int(class_idx),
+                    "class_name": class_name,
+                    "split": split,
+                })
 
-        image_paths.sort()
+        per_class[class_name] = class_samples
 
-        for p in image_paths:
-            samples.append({
-                "image_path": p,
-                "label": int(class_idx),
-                "class_name": class_name,
-                "split": split,
-            })
+    all_samples = []
+    for samples in per_class.values():
+        all_samples.extend(samples)
 
-    samples.sort(key=lambda x: str(x["image_path"]))
-
-    if limit and limit > 0:
-        samples = samples[:limit]
-
-    if not samples:
+    if not all_samples:
         raise ValueError(f"{split_dir.resolve()} 中没有找到有效图片。")
 
-    return samples
+    if not limit or limit <= 0 or limit >= len(all_samples):
+        return all_samples
+
+    if not balanced:
+        samples = list(all_samples)
+        rng.shuffle(samples)
+        return samples[:limit]
+
+    # 分层均衡抽样：先给每类分配 base，再把余量分给仍有剩余样本的类别。
+    class_items = list(per_class.items())
+    n_classes = len(class_items)
+    base = max(1, limit // max(n_classes, 1))
+    selected: List[Dict[str, Any]] = []
+    leftovers: List[Dict[str, Any]] = []
+
+    for class_name, samples in class_items:
+        shuffled = list(samples)
+        rng.shuffle(shuffled)
+
+        take = min(base, len(shuffled))
+        selected.extend(shuffled[:take])
+        leftovers.extend(shuffled[take:])
+
+    if len(selected) < limit and leftovers:
+        rng.shuffle(leftovers)
+        selected.extend(leftovers[:limit - len(selected)])
+
+    selected = selected[:limit]
+    selected.sort(key=lambda x: (int(x["label"]), str(x["image_path"])))
+    return selected
 
 
 def get_calibration_samples(
@@ -494,10 +600,10 @@ def get_calibration_samples(
 
     if (data_dir / calib_split).exists():
         logger.info(f"使用 calibration split：{calib_split}")
-        return list_samples_from_split(data_dir, calib_split, class_to_idx, limit=limit)
+        return list_samples_from_split(data_dir, calib_split, class_to_idx, limit=limit, seed=int(cfg.get("seed", 42)), balanced=True)
 
     logger.warning(f"没有找到 {calib_split}，改用 {fallback_split} 作为 INT8 校准集。")
-    return list_samples_from_split(data_dir, fallback_split, class_to_idx, limit=limit)
+    return list_samples_from_split(data_dir, fallback_split, class_to_idx, limit=limit, seed=int(cfg.get("seed", 42)), balanced=True)
 
 
 def save_dataset_summary(
@@ -739,23 +845,78 @@ def check_onnx_with_ort(onnx_path: Path, sample: Dict[str, Any], cfg: Dict[str, 
 # SavedModel 与 TFLite 转换
 # =========================================================
 
+def find_direct_tflite_files(folder: Path) -> List[Path]:
+    """查找 onnx2tf 直接生成的 TFLite 文件。"""
+    if not folder.exists():
+        return []
+    return sorted([p for p in folder.rglob("*.tflite") if p.is_file()])
+
+
+def select_direct_tflite(files: List[Path], quant_type: str) -> Optional[Path]:
+    """从 onnx2tf 直接输出中选择最匹配的 tflite。"""
+    if not files:
+        return None
+
+    qt = str(quant_type).lower()
+    scored = []
+
+    for p in files:
+        name = p.name.lower()
+        score = 0
+
+        if qt in ("fp16", "float16"):
+            if "float16" in name or "fp16" in name:
+                score += 100
+            if "int8" in name or "integer" in name:
+                score -= 50
+        elif qt == "float32":
+            if "float32" in name or "fp32" in name:
+                score += 100
+            if "float16" in name or "fp16" in name or "int8" in name or "integer" in name:
+                score -= 50
+        elif qt == "int8":
+            if "int8" in name or "integer" in name:
+                score += 100
+            if "float16" in name or "fp16" in name:
+                score -= 30
+
+        # 更小的文件通常是量化版本；float32 通常更大。
+        scored.append((score, p.stat().st_size, p))
+
+    if qt == "float32":
+        scored.sort(key=lambda x: (x[0], x[1]), reverse=True)
+    else:
+        scored.sort(key=lambda x: (x[0], -x[1]), reverse=True)
+
+    best = scored[0]
+    return best[2] if best[0] > -50 else None
+
+
 def convert_onnx_to_saved_model(
     onnx_path: Path,
     saved_model_dir: Path,
     logger: logging.Logger
 ) -> Path:
+    """
+    ONNX -> SavedModel/TFLite。
+
+    兼容修复：
+    新版 onnx2tf 在某些配置下不会生成 saved_model.pb，而是直接写出 .tflite。
+    旧脚本强制检查 saved_model.pb，因此会误报失败。这里不再把缺少
+    saved_model.pb 视为立即失败；如果发现直接生成的 .tflite，后续流程会直接使用它。
+    """
     try:
         import onnx2tf
     except Exception as e:
         raise ImportError(
-            "缺少 onnx2tf，无法执行 ONNX -> SavedModel。"
+            "缺少 onnx2tf，无法执行 ONNX -> SavedModel/TFLite。"
             "请先安装：pip install onnx2tf"
         ) from e
 
     if saved_model_dir.exists():
         shutil.rmtree(saved_model_dir)
 
-    logger.info(f"[onnx2tf] converting ONNX -> SavedModel: {saved_model_dir}")
+    logger.info(f"[onnx2tf] converting ONNX -> SavedModel/TFLite: {saved_model_dir}")
 
     onnx2tf.convert(
         input_onnx_file_path=str(onnx_path),
@@ -767,12 +928,24 @@ def convert_onnx_to_saved_model(
 
     pb_path = saved_model_dir / "saved_model.pb"
 
-    if not pb_path.exists():
-        raise FileNotFoundError(f"onnx2tf 结束后没有找到 saved_model.pb：{pb_path}")
+    if pb_path.exists():
+        logger.info("[onnx2tf] SavedModel export done.")
+        return saved_model_dir
 
-    logger.info("[onnx2tf] SavedModel export done.")
+    direct_tflites = find_direct_tflite_files(saved_model_dir)
 
-    return saved_model_dir
+    if direct_tflites:
+        logger.warning(
+            "onnx2tf 未生成 saved_model.pb，但检测到直接生成的 TFLite 文件；"
+            "将跳过 SavedModel -> TFLite 二次转换，直接使用这些文件。"
+        )
+        for p in direct_tflites:
+            logger.info(f"[onnx2tf-direct] {p} ({file_size_mb(p):.3f} MB)")
+        return saved_model_dir
+
+    raise FileNotFoundError(
+        f"onnx2tf 结束后既没有找到 saved_model.pb，也没有找到 .tflite：{saved_model_dir}"
+    )
 
 
 def tf_dtype_from_name(name: str):
@@ -1325,6 +1498,135 @@ def compare_prediction_consistency(
     return path
 
 
+def get_class_mapping_from_config_file(config_path: Path, logger: logging.Logger) -> Tuple[Dict[str, int], Dict[int, str]]:
+    """从外部 class_mapping JSON 文件加载类别映射。"""
+    if not config_path.exists():
+        raise FileNotFoundError(f"class config 文件不存在：{config_path.resolve()}")
+
+    with open(config_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    class_to_idx = data.get("class_to_idx", {})
+    if not class_to_idx:
+        raise ValueError(f"class config 文件中没有 class_to_idx：{config_path}")
+
+    class_to_idx = {str(k): int(v) for k, v in class_to_idx.items()}
+    idx_to_class = {int(v): str(k) for k, v in class_to_idx.items()}
+
+    logger.info(f"从外部配置加载类别映射：{class_to_idx}")
+    return class_to_idx, idx_to_class
+
+
+def dry_run_checks(
+    cfg: Dict[str, Any],
+    data_dir: Path,
+    ckpt_path: Path,
+    logger: logging.Logger
+) -> bool:
+    """Dry-run：检查所有预条件，不实际导出。"""
+    checks = []
+
+    logger.info("=" * 60)
+    logger.info("DRY-RUN 预检开始")
+    logger.info("=" * 60)
+
+    check_ok = ckpt_path.exists()
+    checks.append(("PyTorch checkpoint 存在", check_ok, str(ckpt_path.resolve())))
+    logger.info(f"[{'OK' if check_ok else 'FAIL'}] checkpoint: {ckpt_path.resolve()}")
+
+    try:
+        device = torch.device("cpu")
+        loaded = safe_torch_load(ckpt_path, device)
+        checks.append(("checkpoint 可加载", True, ""))
+        logger.info("[OK] checkpoint 可加载")
+    except Exception as e:
+        checks.append(("checkpoint 可加载", False, str(e)))
+        _print_checks(checks)
+        return False
+
+    try:
+        state_dict = strip_module_prefix(extract_state_dict(loaded))
+        checks.append(("state_dict 可提取", True, f"{len(state_dict)} keys"))
+        logger.info(f"[OK] state_dict: {len(state_dict)} keys")
+    except Exception as e:
+        checks.append(("state_dict 可提取", False, str(e)))
+        _print_checks(checks)
+        return False
+
+    num_classes_ok = False
+    class_config_path_str = cfg.get("class_config_path", "")
+    try:
+        if class_config_path_str:
+            config_file = Path(class_config_path_str)
+            if not config_file.is_absolute():
+                config_file = PROJECT_ROOT / config_file
+            c2i, i2c = get_class_mapping_from_config_file(config_file, logger)
+        else:
+            c2i, i2c = get_class_mapping_from_checkpoint(loaded, data_dir, cfg, logger)
+        num_classes = len(c2i)
+        num_classes_ok = num_classes == 5
+        checks.append(("num_classes = 5", num_classes_ok, f"实际: {num_classes}"))
+        logger.info(f"[{'OK' if num_classes_ok else 'FAIL'}] num_classes = {num_classes}")
+    except Exception as e:
+        checks.append(("num_classes = 5", False, str(e)))
+        c2i, i2c = {}, {}
+
+    try:
+        if num_classes_ok:
+            model_name = get_model_name_from_checkpoint(loaded, cfg)
+            model = build_model(model_name, num_classes)
+            model.load_state_dict(state_dict, strict=False)
+            out_features = model.classifier[3].out_features
+            out_ok = out_features == num_classes
+            checks.append(("输出层 = num_classes", out_ok, f"实际: {out_features}"))
+            logger.info(f"[{'OK' if out_ok else 'FAIL'}] classifier[3].out_features = {out_features}")
+    except Exception as e:
+        checks.append(("输出层 = num_classes", False, str(e)))
+
+    try:
+        expected_order = ["待分拣", "其他", "厨余", "可回收", "有害"]
+        actual_order = [i2c.get(i, "?") for i in range(min(num_classes, len(i2c)))]
+        mapping_ok = actual_order[:num_classes] == expected_order[:num_classes]
+        checks.append(("类别顺序正确", mapping_ok, f"实际: {actual_order}"))
+        logger.info(f"[{'OK' if mapping_ok else 'FAIL'}] 类别顺序: {actual_order}")
+    except Exception as e:
+        checks.append(("类别顺序正确", False, str(e)))
+
+    try:
+        out_root = Path(cfg["outdir"])
+        out_root.mkdir(parents=True, exist_ok=True)
+        checks.append(("output-dir 可创建", True, str(out_root.resolve())))
+    except Exception as e:
+        checks.append(("output-dir 可创建", False, str(e)))
+
+    img_size = int(cfg.get("img_size", 224))
+    checks.append(("image_size = 224", True, str(img_size)))
+
+    dep_list = check_export_dependencies(logger)
+    dep_ok = len(dep_list) == 0
+    checks.append(("导出依赖齐全", dep_ok, f"缺失: {dep_list}" if dep_list else "全部就绪"))
+
+    _print_checks(checks)
+    return all(ok for _, ok, _ in checks)
+
+
+def _print_checks(checks):
+    print()
+    print("=" * 60)
+    print("DRY-RUN 预检结果")
+    print("=" * 60)
+    for name, ok, detail in checks:
+        icon = "OK" if ok else "FAIL"
+        line = f"  [{icon}] {name}"
+        if detail:
+            line += f": {detail}"
+        print(line)
+    n_ok = sum(1 for _, ok, _ in checks if ok)
+    n_total = len(checks)
+    print(f"\n结果: {n_ok}/{n_total} 通过")
+    print("=" * 60)
+
+
 # =========================================================
 # 主程序
 # =========================================================
@@ -1332,7 +1634,37 @@ def compare_prediction_consistency(
 def main():
     warnings.filterwarnings("ignore", category=UserWarning)
 
-    cfg = dict(CONFIG)
+    # ── 命令行参数解析 ──
+    parser = argparse.ArgumentParser(
+        description="MobileNetV3 垃圾分类五分类模型导出 — PyTorch → ONNX → TFLite",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""示例:
+  # Dry-run 预检
+  python model_export_tflite.py --model-path models/vision_trigger_5class_mobilenetv3/latest_mobilenetv3_best.pt --output-dir models/vision_trigger_5class_tflite --class-config 09_Vision_Trigger_5Class_System/config/class_mapping_5class.json --data-dir garbage_dataset --num-classes auto --dry-run
+
+  # 实际导出 + float16 + 验证
+  python model_export_tflite.py --model-path models/vision_trigger_5class_mobilenetv3/latest_mobilenetv3_best.pt --output-dir models/vision_trigger_5class_tflite --class-config 09_Vision_Trigger_5Class_System/config/class_mapping_5class.json --data-dir garbage_dataset --num-classes auto --quantize-float16 --verify --verify-samples 100
+"""
+    )
+    parser.add_argument("--model-path", type=str, default=None, help="PyTorch checkpoint .pt 文件路径")
+    parser.add_argument("--output-dir", type=str, default=None, help="量化导出根目录")
+    parser.add_argument("--class-config", type=str, default=None, help="外部 class_mapping JSON 文件路径")
+    parser.add_argument("--data-dir", type=str, default=None, help="数据集目录 (train/val/test)")
+    parser.add_argument("--model-name", type=str, default="auto", choices=["auto", "mobilenet_v3_small", "mobilenet_v3_large"], help="模型名称 (默认 auto)")
+    parser.add_argument("--num-classes", type=str, default="auto", help="类别数 (默认 auto 从 checkpoint/class config 推断)")
+    parser.add_argument("--image-size", type=int, default=224, help="输入图像尺寸 (默认 224)")
+    parser.add_argument("--batch-size", type=int, default=1, help="推理批大小 (默认 1)")
+    parser.add_argument("--device", type=str, default="auto", choices=["auto", "cpu", "cuda"], help="device (默认 auto)")
+    parser.add_argument("--quantize-float16", action="store_true", default=False, help="导出 float16 TFLite")
+    parser.add_argument("--quantize-int8", action="store_true", default=False, help="导出 INT8 TFLite（默认关闭；需要校准集）")
+    parser.add_argument("--verify", action="store_true", default=False, help="导出后验证 PyTorch vs TFLite top1 一致率")
+    parser.add_argument("--verify-samples", type=int, default=0, help="验证样本数 (默认 0 表示全量 test)")
+    parser.add_argument("--dry-run", action="store_true", default=False, help="预检模式：只检查不导出")
+
+    args = parser.parse_args()
+    cfg = merge_cli_to_config(args)
+
+    # ── 路径解析 ──
     cfg["data_dir"] = str((PROJECT_ROOT / cfg["data_dir"]).resolve())
     cfg["ckpt"] = str((PROJECT_ROOT / cfg["ckpt"]).resolve())
     cfg["outdir"] = str((PROJECT_ROOT / cfg["outdir"]).resolve())
@@ -1341,14 +1673,71 @@ def main():
     data_dir = Path(cfg["data_dir"])
     ckpt_path = Path(cfg["ckpt"])
 
+    # ── Dry-run 模式：只检查不导出 ──
+    if cfg.get("run_dry_run", False):
+        logger_temp = logging.getLogger("dry_run")
+        logger_temp.setLevel(logging.INFO)
+        logger_temp.handlers.clear()
+        ch = logging.StreamHandler()
+        ch.setFormatter(logging.Formatter(fmt="%(asctime)s | %(levelname)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+        logger_temp.addHandler(ch)
+
+        ok = dry_run_checks(cfg, data_dir, ckpt_path, logger_temp)
+        sys.exit(0 if ok else 1)
+
+    # 延迟导入可选依赖 — sklearn/matplotlib 仅导出时需要
+    global classification_report, confusion_matrix, accuracy_score, plt
+    try:
+        from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except ImportError:
+        pass  # sklearn/matplotlib 可选，不影响核心导出流程
+
+    # 触发 ONNX/TF 惰性导入
+    _lazy_import_onnx()
+    _lazy_import_ort()
+    _lazy_import_onnxsim()
+    _lazy_import_tf()
+
+    # ── 正常导出模式 ──
     if not data_dir.exists():
         raise FileNotFoundError(f"数据集目录不存在：{data_dir.resolve()}")
 
     if not ckpt_path.exists():
         raise FileNotFoundError(f"checkpoint 不存在：{ckpt_path.resolve()}")
 
+    # ── 导出依赖检查 ──
     run_dir = prepare_run_dir(cfg)
     logger = setup_logger(run_dir)
+    missing_deps = check_export_dependencies(logger)
+    if missing_deps:
+        logger.error(f"缺少导出依赖: {', '.join(missing_deps)}")
+        logger.error("")
+        logger.error("请安装以下依赖后重试:")
+        logger.error(f"  pip install {' '.join(missing_deps)}")
+        logger.error("")
+        logger.error("如果 tensorflow 报 numpy 兼容性错误，请先降级 numpy:")
+        logger.error("  pip install \"numpy<2\"")
+        logger.error("")
+        logger.error("或者使用以下完整安装命令:")
+        logger.error("  pip install onnx onnxruntime onnxsim tensorflow \"numpy<2\"")
+        logger.error("")
+        logger.info(f"已生成空运行目录: {run_dir}")
+        # 写入依赖缺失报告
+        deps_report = {
+            "status": "blocked",
+            "missing_dependencies": missing_deps,
+            "fix_commands": [
+                "pip install onnx onnxruntime onnxsim",
+                "pip install \"numpy<2\"",
+                "pip install tensorflow",
+            ],
+        }
+        write_json(run_dir / "export_summary.json", deps_report)
+        logger.info(f"依赖报告: {run_dir / 'export_summary.json'}")
+        sys.exit(1)
 
     device = get_device(str(cfg.get("device", "cpu")))
 
@@ -1381,6 +1770,43 @@ def main():
 
     logger.info(f"class mapping saved: {class_mapping_path}")
 
+    # ── 外部类别配置覆盖 ──
+    class_config_path_str = cfg.get("class_config_path", "")
+    if class_config_path_str:
+        config_file = Path(class_config_path_str)
+        if not config_file.is_absolute():
+            config_file = PROJECT_ROOT / config_file
+        if config_file.exists():
+            external_c2i, external_i2c = get_class_mapping_from_config_file(config_file, logger)
+            logger.info(f"外部类别配置加载: {external_c2i}")
+            class_to_idx = external_c2i
+            idx_to_class = external_i2c
+            num_classes = len(class_to_idx)
+            logger.info(f"已覆盖类别映射，num_classes = {num_classes}")
+
+    # ── 类别顺序验证 ──
+    expected_order = ["待分拣", "其他", "厨余", "可回收", "有害"]
+    actual_order = [idx_to_class.get(i, "?") for i in range(min(num_classes, len(idx_to_class)))]
+    if actual_order[:5] == expected_order:
+        logger.info(f"✓ 类别顺序正确: {actual_order}")
+    else:
+        logger.warning(f"⚠ 类别顺序不匹配！期望: {expected_order}, 实际: {actual_order}")
+
+    # ── class_names.json ──
+    class_names_path = run_dir / "class_names.json"
+    write_json(class_names_path, [idx_to_class[i] for i in range(num_classes)])
+
+    # ── export_config.json ──
+    export_config_path = run_dir / "export_config.json"
+    write_json(export_config_path, {
+        "model_type": model_name,
+        "num_classes": num_classes,
+        "class_names": [idx_to_class[i] for i in range(num_classes)],
+        "image_size": int(cfg.get("img_size", 224)),
+        "normalize": {"mean": cfg["mean"], "std": cfg["std"]},
+        "pytorch_ckpt": str(ckpt_path.resolve()),
+    })
+
     test_split = str(cfg.get("test_split", "test"))
     verify_limit = int(cfg.get("verify_limit", 0))
 
@@ -1388,7 +1814,9 @@ def main():
         data_dir,
         test_split,
         class_to_idx,
-        limit=verify_limit
+        limit=verify_limit,
+        seed=int(cfg.get("seed", 42)),
+        balanced=True
     )
 
     calib_samples = get_calibration_samples(
@@ -1445,7 +1873,7 @@ def main():
     # 2. 导出 ONNX
     # =====================================================
 
-    onnx_path = run_dir / "model.onnx"
+    onnx_path = run_dir / "model_float32.onnx"
 
     export_onnx(
         model=model,
@@ -1517,65 +1945,132 @@ def main():
     # =====================================================
 
     tflite_paths = {}
+    saved_model_pb = saved_model_dir / "saved_model.pb"
 
-    if cfg.get("export_tflite_float32", True):
-        path = run_dir / "model_float32.tflite"
-        tflite_paths["tflite_float32"] = convert_saved_model_to_tflite(
-            saved_model_dir=saved_model_dir,
-            out_path=path,
-            quant_type="float32",
-            cfg=cfg,
-            calib_samples=calib_samples,
-            logger=logger
-        )
+    if saved_model_pb.exists():
+        if cfg.get("export_tflite_float32", True):
+            path = run_dir / "garbage_mobilenetv3_5class_float32.tflite"
+            tflite_paths["tflite_float32"] = convert_saved_model_to_tflite(
+                saved_model_dir=saved_model_dir,
+                out_path=path,
+                quant_type="float32",
+                cfg=cfg,
+                calib_samples=calib_samples,
+                logger=logger
+            )
 
-    if cfg.get("export_tflite_fp16", True):
-        path = run_dir / "model_fp16.tflite"
-        tflite_paths["tflite_fp16"] = convert_saved_model_to_tflite(
-            saved_model_dir=saved_model_dir,
-            out_path=path,
-            quant_type="fp16",
-            cfg=cfg,
-            calib_samples=calib_samples,
-            logger=logger
-        )
+        if cfg.get("export_tflite_fp16", True):
+            path = run_dir / "garbage_mobilenetv3_5class_float16.tflite"
+            tflite_paths["tflite_fp16"] = convert_saved_model_to_tflite(
+                saved_model_dir=saved_model_dir,
+                out_path=path,
+                quant_type="fp16",
+                cfg=cfg,
+                calib_samples=calib_samples,
+                logger=logger
+            )
 
-    if cfg.get("export_tflite_int8", True):
-        path = run_dir / "model_int8.tflite"
-        tflite_paths["tflite_int8"] = convert_saved_model_to_tflite(
-            saved_model_dir=saved_model_dir,
-            out_path=path,
-            quant_type="int8",
-            cfg=cfg,
-            calib_samples=calib_samples,
-            logger=logger
-        )
+        if cfg.get("export_tflite_int8", False):
+            path = run_dir / "model_int8.tflite"
+            tflite_paths["tflite_int8"] = convert_saved_model_to_tflite(
+                saved_model_dir=saved_model_dir,
+                out_path=path,
+                quant_type="int8",
+                cfg=cfg,
+                calib_samples=calib_samples,
+                logger=logger
+            )
+    else:
+        direct_tflites = find_direct_tflite_files(saved_model_dir)
+        logger.info("[TFLite] SavedModel 不存在，使用 onnx2tf 直接生成的 TFLite 文件。")
+
+        if cfg.get("export_tflite_float32", True):
+            src = select_direct_tflite(direct_tflites, "float32")
+            if src is not None:
+                dst = run_dir / "garbage_mobilenetv3_5class_float32.tflite"
+                if src.resolve() != dst.resolve():
+                    shutil.copy2(src, dst)
+                tflite_paths["tflite_float32"] = dst
+                logger.info(f"[TFLite-direct] float32 -> {dst}")
+
+        if cfg.get("export_tflite_fp16", True):
+            src = select_direct_tflite(direct_tflites, "float16")
+            if src is not None:
+                dst = run_dir / "garbage_mobilenetv3_5class_float16.tflite"
+                if src.resolve() != dst.resolve():
+                    shutil.copy2(src, dst)
+                tflite_paths["tflite_fp16"] = dst
+                logger.info(f"[TFLite-direct] float16 -> {dst}")
+
+        if cfg.get("export_tflite_int8", False):
+            src = select_direct_tflite(direct_tflites, "int8")
+            if src is not None:
+                dst = run_dir / "model_int8.tflite"
+                if src.resolve() != dst.resolve():
+                    shutil.copy2(src, dst)
+                tflite_paths["tflite_int8"] = dst
+                logger.info(f"[TFLite-direct] int8 -> {dst}")
+
+        if not tflite_paths:
+            raise RuntimeError(
+                "onnx2tf 没有生成可用的 TFLite 文件，无法继续评估。"
+            )
+
+    failed_tflite_backends = {}
 
     for backend_name, tflite_path in tflite_paths.items():
-        y_true_tf, y_pred_tf, records_tf = evaluate_tflite(
-            tflite_path=tflite_path,
-            backend_name=backend_name,
-            samples=test_samples,
-            cfg=cfg,
-            idx_to_class=idx_to_class,
-            logger=logger
-        )
+        try:
+            y_true_tf, y_pred_tf, records_tf = evaluate_tflite(
+                tflite_path=tflite_path,
+                backend_name=backend_name,
+                samples=test_samples,
+                cfg=cfg,
+                idx_to_class=idx_to_class,
+                logger=logger
+            )
 
-        metrics_tf, report_tf = save_backend_report(
-            run_dir,
-            backend_name,
-            y_true_tf,
-            y_pred_tf,
-            records_tf,
-            idx_to_class,
-            cfg
-        )
+            metrics_tf, report_tf = save_backend_report(
+                run_dir,
+                backend_name,
+                y_true_tf,
+                y_pred_tf,
+                records_tf,
+                idx_to_class,
+                cfg
+            )
 
-        all_metrics.append(metrics_tf)
-        all_prediction_records[backend_name] = records_tf
+            metrics_tf["status"] = "ok"
+            all_metrics.append(metrics_tf)
+            all_prediction_records[backend_name] = records_tf
 
-        logger.info(f"========== {backend_name} Report ==========")
-        logger.info("\n" + report_tf)
+            logger.info(f"========== {backend_name} Report ==========")
+            logger.info("\n" + report_tf)
+
+        except Exception as e:
+            error_text = repr(e)
+            logger.error(f"[Eval] {backend_name} 评估失败，但不会中断整个导出流程。")
+            logger.error(f"[Eval] {backend_name} error: {error_text}")
+            logger.error("[Eval] 如果这是 float16 TFLite，在普通 CPU Interpreter 上不支持部分 FP16 CONV_2D 是常见情况；优先使用已通过验证的 float32 TFLite。")
+
+            failed_tflite_backends[backend_name] = {
+                "path": str(Path(tflite_path).resolve()),
+                "error": error_text,
+                "status": "eval_failed",
+            }
+
+            all_metrics.append({
+                "backend": backend_name,
+                "status": "eval_failed",
+                "accuracy": None,
+                "avg_latency_ms": None,
+                "num_samples": len(test_samples),
+                "error": error_text,
+                "classification_report_txt": None,
+                "confusion_matrix_csv": None,
+                "confusion_matrix_png": None,
+                "per_image_predictions_csv": None,
+            })
+            continue
 
     # =====================================================
     # 6. 后处理：体积、指标汇总、一致性分析
@@ -1614,18 +2109,21 @@ def main():
     baseline_acc = metrics_pt["accuracy"]
 
     for item in all_metrics:
-        acc_drop = baseline_acc - item["accuracy"]
+        acc = item.get("accuracy")
+        acc_drop = None if acc is None else baseline_acc - acc
 
         metrics_rows.append({
-            "backend": item["backend"],
-            "accuracy": item["accuracy"],
+            "backend": item.get("backend"),
+            "status": item.get("status", "ok"),
+            "accuracy": acc,
             "acc_drop_vs_pytorch_fp32": acc_drop,
-            "avg_latency_ms": item["avg_latency_ms"],
-            "num_samples": item["num_samples"],
-            "classification_report_txt": item["classification_report_txt"],
-            "confusion_matrix_csv": item["confusion_matrix_csv"],
-            "confusion_matrix_png": item["confusion_matrix_png"],
-            "per_image_predictions_csv": item["per_image_predictions_csv"],
+            "avg_latency_ms": item.get("avg_latency_ms"),
+            "num_samples": item.get("num_samples"),
+            "error": item.get("error", ""),
+            "classification_report_txt": item.get("classification_report_txt"),
+            "confusion_matrix_csv": item.get("confusion_matrix_csv"),
+            "confusion_matrix_png": item.get("confusion_matrix_png"),
+            "per_image_predictions_csv": item.get("per_image_predictions_csv"),
         })
 
     metrics_summary_path = run_dir / "metrics_summary.csv"
@@ -1635,10 +2133,12 @@ def main():
         metrics_rows,
         [
             "backend",
+            "status",
             "accuracy",
             "acc_drop_vs_pytorch_fp32",
             "avg_latency_ms",
             "num_samples",
+            "error",
             "classification_report_txt",
             "confusion_matrix_csv",
             "confusion_matrix_png",
@@ -1679,6 +2179,7 @@ def main():
         "calibration_samples": len(calib_samples),
         "baseline_pytorch_fp32_acc": baseline_acc,
         "metrics": metrics_rows,
+        "failed_tflite_backends": failed_tflite_backends,
         "files": {
             "config": str(config_path.resolve()),
             "class_mapping": str(class_mapping_path.resolve()),
@@ -1714,12 +2215,18 @@ def main():
     lines.append("")
     lines.append("评估结果：")
     for row in metrics_rows:
-        lines.append(
-            f"{row['backend']} | "
-            f"acc={row['accuracy']:.6f} | "
-            f"drop_vs_pytorch={row['acc_drop_vs_pytorch_fp32']:.6f} | "
-            f"avg_latency_ms={row['avg_latency_ms']:.3f}"
-        )
+        if row.get("accuracy") is None:
+            lines.append(
+                f"{row['backend']} | status={row.get('status')} | "
+                f"error={row.get('error', '')}"
+            )
+        else:
+            lines.append(
+                f"{row['backend']} | "
+                f"acc={row['accuracy']:.6f} | "
+                f"drop_vs_pytorch={row['acc_drop_vs_pytorch_fp32']:.6f} | "
+                f"avg_latency_ms={row['avg_latency_ms']:.3f}"
+            )
     lines.append("")
     lines.append("模型体积：")
     for row in model_size_rows:
@@ -1743,12 +2250,19 @@ def main():
     logger.info(f"model size report: {size_report_path}")
 
     for row in metrics_rows:
-        logger.info(
-            f"[RESULT] {row['backend']} | "
-            f"acc={row['accuracy']:.6f} | "
-            f"drop={row['acc_drop_vs_pytorch_fp32']:.6f} | "
-            f"latency={row['avg_latency_ms']:.3f}ms"
-        )
+        if row.get("accuracy") is None:
+            logger.info(
+                f"[RESULT] {row['backend']} | "
+                f"status={row.get('status')} | "
+                f"error={row.get('error', '')}"
+            )
+        else:
+            logger.info(
+                f"[RESULT] {row['backend']} | "
+                f"acc={row['accuracy']:.6f} | "
+                f"drop={row['acc_drop_vs_pytorch_fp32']:.6f} | "
+                f"latency={row['avg_latency_ms']:.3f}ms"
+            )
 
 
 if __name__ == "__main__":
