@@ -50,7 +50,12 @@ targets:
         bin: ""
         commandLine: python ./tools/stcflash.py -p ${port} "${programFile}"
         eraseChipCommand: ""
-    uploader: Custom
+      stcgal:
+        bin: ""
+        eepromImgPath: "null"
+        extraOptions: ""
+        options: .eide/stc.flash.json
+    uploader: stcgal
   目标 1:
     cppPreprocessAttrs:
       defineList: []
