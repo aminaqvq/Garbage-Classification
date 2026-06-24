@@ -42,15 +42,7 @@ garbage_dataset/logs/
 *.pt
 *.pth
 *.onnx
-*.tflite
 *.pb
-outputs/**/*.pt
-outputs/**/*.onnx
-outputs/**/*.tflite
-export/**/*.onnx
-export/**/*.tflite
-export/**/*.pb
-export/**/saved_model/
 
 # Keep export root-level model copies
 !export/latest_*
@@ -103,6 +95,5 @@ Garbage_Classification_Organized/garbage_dataset/test/**/*
 Garbage_Classification_Organized/models/**/*.pt
 Garbage_Classification_Organized/models/**/*.pth
 Garbage_Classification_Organized/models/**/*.onnx
-Garbage_Classification_Organized/models/**/*.tflite
 Garbage_Classification_Organized/models/**/*.pb
 Garbage_Classification_Organized/models/**/saved_model/
