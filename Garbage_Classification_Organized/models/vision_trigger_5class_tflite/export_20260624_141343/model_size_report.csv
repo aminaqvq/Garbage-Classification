@@ -1,0 +1,4 @@
+﻿name,path,size_mb
+onnx_original,D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\model_float32.onnx,5.823434829711914
+onnx_final,D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\model_float32_simplified.onnx,5.835453033447266
+tflite_float32,D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\garbage_mobilenetv3_5class_float32.tflite,5.838809967041016

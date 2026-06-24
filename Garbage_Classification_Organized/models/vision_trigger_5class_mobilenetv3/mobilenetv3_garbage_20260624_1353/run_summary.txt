@@ -1,0 +1,26 @@
+========== MobileNetV3 五分类训练总结 ==========
+时间：2026-06-24 14:09:48
+数据集：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset
+输出目录：D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_mobilenetv3\mobilenetv3_garbage_20260624_135353
+模型：mobilenet_v3_small
+预训练：True
+设备：cpu
+类别：['待分拣', '其他', '厨余', '可回收', '有害']
+
+best_epoch：11
+best_val_acc：0.997468
+final_val_acc：0.997468
+final_test_acc：1.000000
+
+========== Test Report ==========
+              precision    recall  f1-score   support
+
+         待分拣       1.00      1.00      1.00       104
+          其他       1.00      1.00      1.00        96
+          厨余       1.00      1.00      1.00        42
+         可回收       1.00      1.00      1.00        73
+          有害       1.00      1.00      1.00        86
+
+    accuracy                           1.00       401
+   macro avg       1.00      1.00      1.00       401
+weighted avg       1.00      1.00      1.00       401

@@ -1,7 +1,7 @@
 ========== 垃圾分类数据集划分报告 ==========
-生成时间：2026-06-24 11:07:38
+生成时间：2026-06-24 13:53:34
 原始数据目录：D:\Garbage Classification\Garbage_Classification_Organized\dataset
-输出数据目录：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset_20260624_110735
+输出数据目录：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset
 文件操作模式：copy
 随机种子：42
 
@@ -18,26 +18,26 @@ test：0.15
 4: 有害
 
 每类划分数量：
-待分拣：总数 526，train 368，val 78，test 80
-其他：总数 465，train 325，val 69，test 71
+待分拣：总数 685，train 479，val 102，test 104
+其他：总数 631，train 441，val 94，test 96
 厨余：总数 280，train 196，val 42，test 42
-可回收：总数 306，train 214，val 45，test 47
+可回收：总数 482，train 337，val 72，test 73
 有害：总数 567，train 396，val 85，test 86
 
 整体数量：
-总有效图片：2144
-train 总数：1499
-val 总数：319
-test 总数：326
+总有效图片：2645
+train 总数：1849
+val 总数：395
+test 总数：401
 无效图片数量：0
 
 日志文件：
-split_files_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset_20260624_110735\logs\split_files.csv
-split_summary_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset_20260624_110735\logs\split_summary.csv
-invalid_images_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset_20260624_110735\logs\invalid_images.csv
-split_summary_json：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset_20260624_110735\logs\split_summary.json
-split_report_txt：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset_20260624_110735\logs\split_report.txt
-class_mapping_json：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset_20260624_110735\class_mapping.json
+split_files_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\split_files.csv
+split_summary_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\split_summary.csv
+invalid_images_csv：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\invalid_images.csv
+split_summary_json：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\split_summary.json
+split_report_txt：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\logs\split_report.txt
+class_mapping_json：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\class_mapping.json
 
 说明：
 1. split_files.csv 记录每张有效图片被分到哪里。

@@ -1,27 +1,27 @@
 {
     "source_dir": "D:\\Garbage Classification\\Garbage_Classification_Organized\\dataset",
-    "output_dir": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735",
+    "output_dir": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset",
     "train_ratio": 0.7,
     "val_ratio": 0.15,
     "test_ratio": 0.15,
     "seed": 42,
     "class_counts": {
-        "待分拣": 526,
-        "其他": 465,
+        "待分拣": 685,
+        "其他": 631,
         "厨余": 280,
-        "可回收": 306,
+        "可回收": 482,
         "有害": 567
     },
     "split_counts": {
         "待分拣": {
-            "train": 368,
-            "val": 78,
-            "test": 80
+            "train": 479,
+            "val": 102,
+            "test": 104
         },
         "其他": {
-            "train": 325,
-            "val": 69,
-            "test": 71
+            "train": 441,
+            "val": 94,
+            "test": 96
         },
         "厨余": {
             "train": 196,
@@ -29,9 +29,9 @@
             "test": 42
         },
         "可回收": {
-            "train": 214,
-            "val": 45,
-            "test": 47
+            "train": 337,
+            "val": 72,
+            "test": 73
         },
         "有害": {
             "train": 396,
@@ -39,12 +39,12 @@
             "test": 86
         }
     },
-    "total_images": 2144,
-    "generated_at": "2026-06-24 11:07:38",
+    "total_images": 2645,
+    "generated_at": "2026-06-24 13:53:34",
     "warnings": [],
-    "created_time": "2026-06-24 11:07:38",
+    "created_time": "2026-06-24 13:53:34",
     "input_dataset_dir": "D:\\Garbage Classification\\Garbage_Classification_Organized\\dataset",
-    "output_dataset_dir": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735",
+    "output_dataset_dir": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset",
     "file_operation_mode": "copy",
     "random_seed": 42,
     "split_ratios": {
@@ -59,20 +59,20 @@
         "可回收",
         "有害"
     ],
-    "class_names_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735\\class_names.json",
-    "class_mapping_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735\\class_mapping.json",
+    "class_names_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset\\class_names.json",
+    "class_mapping_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset\\class_mapping.json",
     "class_summary": {
         "待分拣": {
-            "total": 526,
-            "train": 368,
-            "val": 78,
-            "test": 80
+            "total": 685,
+            "train": 479,
+            "val": 102,
+            "test": 104
         },
         "其他": {
-            "total": 465,
-            "train": 325,
-            "val": 69,
-            "test": 71
+            "total": 631,
+            "train": 441,
+            "val": 94,
+            "test": 96
         },
         "厨余": {
             "total": 280,
@@ -81,10 +81,10 @@
             "test": 42
         },
         "可回收": {
-            "total": 306,
-            "train": 214,
-            "val": 45,
-            "test": 47
+            "total": 482,
+            "train": 337,
+            "val": 72,
+            "test": 73
         },
         "有害": {
             "total": 567,
@@ -94,18 +94,18 @@
         }
     },
     "split_total": {
-        "train": 1499,
-        "val": 319,
-        "test": 326
+        "train": 1849,
+        "val": 395,
+        "test": 401
     },
-    "total_valid_images": 2144,
+    "total_valid_images": 2645,
     "invalid_image_count": 0,
     "log_files": {
-        "split_files_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735\\logs\\split_files.csv",
-        "split_summary_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735\\logs\\split_summary.csv",
-        "invalid_images_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735\\logs\\invalid_images.csv",
-        "split_summary_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735\\logs\\split_summary.json",
-        "split_report_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735\\logs\\split_report.txt",
-        "class_mapping_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset_20260624_110735\\class_mapping.json"
+        "split_files_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset\\logs\\split_files.csv",
+        "split_summary_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset\\logs\\split_summary.csv",
+        "invalid_images_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset\\logs\\invalid_images.csv",
+        "split_summary_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset\\logs\\split_summary.json",
+        "split_report_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset\\logs\\split_report.txt",
+        "class_mapping_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset\\class_mapping.json"
     }
 }

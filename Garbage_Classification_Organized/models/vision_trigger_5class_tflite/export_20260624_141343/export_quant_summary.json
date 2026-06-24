@@ -1,0 +1,82 @@
+{
+    "created_time": "2026-06-24 14:14:00",
+    "data_dir": "D:\\Garbage Classification\\Garbage_Classification_Organized\\garbage_dataset",
+    "ckpt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\latest_mobilenetv3_best.pt",
+    "run_dir": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343",
+    "model_name": "mobilenet_v3_small",
+    "num_classes": 5,
+    "class_to_idx": {
+        "待分拣": 0,
+        "其他": 1,
+        "厨余": 2,
+        "可回收": 3,
+        "有害": 4
+    },
+    "idx_to_class": {
+        "0": "待分拣",
+        "1": "其他",
+        "2": "厨余",
+        "3": "可回收",
+        "4": "有害"
+    },
+    "test_samples": 401,
+    "calibration_samples": 500,
+    "baseline_pytorch_fp32_acc": 1.0,
+    "metrics": [
+        {
+            "backend": "pytorch_fp32",
+            "status": "ok",
+            "accuracy": 1.0,
+            "acc_drop_vs_pytorch_fp32": 0.0,
+            "avg_latency_ms": 8.565255860332146,
+            "num_samples": 401,
+            "error": "",
+            "classification_report_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\pytorch_fp32_classification_report.txt",
+            "confusion_matrix_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\pytorch_fp32_confusion_matrix.csv",
+            "confusion_matrix_png": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\pytorch_fp32_confusion_matrix.png",
+            "per_image_predictions_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\pytorch_fp32_per_image_predictions.csv"
+        },
+        {
+            "backend": "onnx_fp32",
+            "status": "ok",
+            "accuracy": 1.0,
+            "acc_drop_vs_pytorch_fp32": 0.0,
+            "avg_latency_ms": 2.124078553638276,
+            "num_samples": 401,
+            "error": "",
+            "classification_report_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_classification_report.txt",
+            "confusion_matrix_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_confusion_matrix.csv",
+            "confusion_matrix_png": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_confusion_matrix.png",
+            "per_image_predictions_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_per_image_predictions.csv"
+        },
+        {
+            "backend": "tflite_float32",
+            "status": "ok",
+            "accuracy": 1.0,
+            "acc_drop_vs_pytorch_fp32": 0.0,
+            "avg_latency_ms": 2.756705486270883,
+            "num_samples": 401,
+            "error": "",
+            "classification_report_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\tflite_float32_classification_report.txt",
+            "confusion_matrix_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\tflite_float32_confusion_matrix.csv",
+            "confusion_matrix_png": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\tflite_float32_confusion_matrix.png",
+            "per_image_predictions_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\tflite_float32_per_image_predictions.csv"
+        }
+    ],
+    "failed_tflite_backends": {},
+    "files": {
+        "config": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\config.json",
+        "class_mapping": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\class_mapping.json",
+        "dataset_summary": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\dataset_summary.csv",
+        "onnx": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\model_float32_simplified.onnx",
+        "saved_model": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\saved_model",
+        "metrics_summary": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\metrics_summary.csv",
+        "model_size_report": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\model_size_report.csv",
+        "prediction_consistency": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\backend_prediction_consistency.csv",
+        "console_log": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\console.log",
+        "latest_files": {
+            "tflite_float32": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\latest_tflite_float32.tflite",
+            "onnx": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\latest_model.onnx"
+        }
+    }
+}

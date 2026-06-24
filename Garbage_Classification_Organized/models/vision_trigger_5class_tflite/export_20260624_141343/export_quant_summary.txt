@@ -1,0 +1,31 @@
+========== MobileNetV3 垃圾分类模型量化导出报告 ==========
+生成时间：2026-06-24 14:14:00
+
+数据集目录：D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset
+checkpoint：D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_mobilenetv3\latest_mobilenetv3_best.pt
+输出目录：D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343
+模型：mobilenet_v3_small
+类别数：5
+
+类别映射：
+0: 待分拣
+1: 其他
+2: 厨余
+3: 可回收
+4: 有害
+
+评估结果：
+pytorch_fp32 | acc=1.000000 | drop_vs_pytorch=0.000000 | avg_latency_ms=8.565
+onnx_fp32 | acc=1.000000 | drop_vs_pytorch=0.000000 | avg_latency_ms=2.124
+tflite_float32 | acc=1.000000 | drop_vs_pytorch=0.000000 | avg_latency_ms=2.757
+
+模型体积：
+onnx_original | 5.823 MB | D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\model_float32.onnx
+onnx_final | 5.835 MB | D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\model_float32_simplified.onnx
+tflite_float32 | 5.839 MB | D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\garbage_mobilenetv3_5class_float32.tflite
+
+关键文件：
+metrics_summary.csv：D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\metrics_summary.csv
+model_size_report.csv：D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\model_size_report.csv
+export_quant_summary.json：D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\export_quant_summary.json
+console.log：D:\Garbage Classification\Garbage_Classification_Organized\models\vision_trigger_5class_tflite\export_20260624_141343\console.log

@@ -1,0 +1,45 @@
+{
+    "待分拣": {
+        "precision": 1.0,
+        "recall": 0.9901960784313726,
+        "f1-score": 0.9950738916256158,
+        "support": 102.0
+    },
+    "其他": {
+        "precision": 0.9894736842105263,
+        "recall": 1.0,
+        "f1-score": 0.9947089947089947,
+        "support": 94.0
+    },
+    "厨余": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 42.0
+    },
+    "可回收": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 72.0
+    },
+    "有害": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 85.0
+    },
+    "accuracy": 0.9974683544303797,
+    "macro avg": {
+        "precision": 0.9978947368421054,
+        "recall": 0.9980392156862745,
+        "f1-score": 0.9979565772669222,
+        "support": 395.0
+    },
+    "weighted avg": {
+        "precision": 0.9974950033311126,
+        "recall": 0.9974683544303797,
+        "f1-score": 0.9974688163252109,
+        "support": 395.0
+    }
+}

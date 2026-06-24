@@ -1,0 +1,11 @@
+{
+    "backend": "onnx_fp32",
+    "accuracy": 1.0,
+    "avg_latency_ms": 2.124078553638276,
+    "num_samples": 401,
+    "classification_report_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_classification_report.txt",
+    "classification_report_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_classification_report.json",
+    "confusion_matrix_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_confusion_matrix.csv",
+    "confusion_matrix_png": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_confusion_matrix.png",
+    "per_image_predictions_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_tflite\\export_20260624_141343\\onnx_fp32_per_image_predictions.csv"
+}

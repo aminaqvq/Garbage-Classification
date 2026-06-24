@@ -83,9 +83,11 @@ CONFIG: Dict[str, Any] = {
     "data_dir": "garbage_dataset",
     "ckpt": "models/vision_trigger_5class_mobilenetv3/latest_mobilenetv3_best.pt",
     "outdir": "models/vision_trigger_5class_tflite",
+
     "model_name": "auto",
     "num_classes": "auto",
     "device": "cpu",
+
     "img_size": 224,
     "resize_size": 256,
     "eval_preprocess": "resize_center_crop",
@@ -93,35 +95,23 @@ CONFIG: Dict[str, Any] = {
     "mean": [0.485, 0.456, 0.406],
     "std": [0.229, 0.224, 0.225],
     "rgb": True,
-    "opset": 13,
-    "input_name": "input",
-    "output_name": "output",
-    "onnx_simplify": True,
-    "onnx_dynamic_batch": True,
-    "check_onnx_with_ort": True,
+
     "export_tflite_float32": True,
     "export_tflite_fp16": False,
     "export_tflite_int8": False,
-    "int8_input_type": "float32",
-    "int8_output_type": "float32",
-    "calib_split": "calibration",
-    "calib_fallback_split": "train",
-    "calib_limit": 500,
+
     "test_split": "test",
     "verify_limit": 0,
-    "overwrite_outdir": False,
+
     "save_per_image_predictions": True,
     "save_confusion_matrix_png": True,
-    "seed": 42,
-    # v1.6 新增：外部类别配置与验证控制
-    "class_config_path": "",
-    "run_dry_run": False,
-    "run_verify": False,
-    "verify_samples": 0,
-    "batch_size": 1,
+
+    "class_config_path": r"D:\Garbage Classification\Garbage_Classification_Organized\garbage_dataset\class_mapping.json",
+
     "quantize_float16": False,
     "quantize_int8": False,
 }
+
 
 
 def merge_cli_to_config(args: argparse.Namespace) -> Dict[str, Any]:

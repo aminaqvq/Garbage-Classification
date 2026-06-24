@@ -1,0 +1,97 @@
+{
+    "split": "test",
+    "accuracy": 1.0,
+    "loss": 0.0050073472547526015,
+    "classification_report": {
+        "待分拣": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 104.0
+        },
+        "其他": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 96.0
+        },
+        "厨余": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 42.0
+        },
+        "可回收": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 73.0
+        },
+        "有害": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 86.0
+        },
+        "accuracy": 1.0,
+        "macro avg": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 401.0
+        },
+        "weighted avg": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 401.0
+        }
+    },
+    "confusion_matrix": [
+        [
+            104,
+            0,
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            96,
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            42,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            73,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            0,
+            86
+        ]
+    ],
+    "pending_recall": 1.0,
+    "pending_false_trigger_count": 0,
+    "garbage_to_pending_count": 0,
+    "files": {
+        "report_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_135353\\test_classification_report.txt",
+        "report_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_135353\\test_classification_report.json",
+        "confusion_matrix_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_135353\\test_confusion_matrix.csv",
+        "confusion_matrix_png": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_135353\\test_confusion_matrix.png",
+        "per_image_predictions_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_135353\\test_per_image_predictions.csv"
+    }
+}
