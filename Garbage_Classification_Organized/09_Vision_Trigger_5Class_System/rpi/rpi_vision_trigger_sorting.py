@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-"""★ 最终树莓派上位机：五分类视觉触发 + 串口 RKHO + 满载保护 + MCU 反馈
+"""★ 最终树莓派上位机：五分类视觉触发 + 串口 RKHO + 满载保护 + MCU 反馈\n\n可直接运行版：默认使用 float32 TFLite，默认连接单片机，自动查找串口
 
 状态机：
   BOOT → IDLE_WAIT_VISUAL → CANDIDATE_DETECTED → SEND_SORT_COMMAND
@@ -44,6 +43,26 @@ CONFIG_DIR = PROJECT_ROOT_DEFAULT / "09_Vision_Trigger_5Class_System" / "config"
 MODELS_DIR = PROJECT_ROOT_DEFAULT / "models" / "vision_trigger_5class_tflite"
 DEFAULT_CLASS_CONFIG = CONFIG_DIR / "class_mapping_5class.json"
 DEFAULT_RUNTIME_CONFIG = CONFIG_DIR / "runtime_config.example.json"
+
+
+def _default_model_path() -> Path:
+    """
+    树莓派 + tflite_runtime 稳定版：
+    只允许默认加载 float32 模型，禁止自动回退到 float16，
+    避免 CONV_2D 在 allocate_tensors() 阶段报 input_type 错误。
+    """
+    candidates = [
+        MODELS_DIR / "model_float32_simplified_float32.tflite",
+        MODELS_DIR / "latest_tflite_float32.tflite",
+    ]
+    for p in candidates:
+        if p.exists():
+            return p
+    raise FileNotFoundError(
+        "未找到 float32 TFLite 模型文件。请确认存在：\n"
+        f"  {MODELS_DIR / 'model_float32_simplified_float32.tflite'}\n"
+        f"或：\n  {MODELS_DIR / 'latest_tflite_float32.tflite'}"
+    )
 
 SERIAL_PORT_DEFAULT = "/dev/ttyAMA0"
 BAUDRATE_DEFAULT = 9600
@@ -114,6 +133,58 @@ def hex_str(data: bytes) -> str:
     return " ".join(f"{b:02X}" for b in data)
 
 
+def auto_detect_serial_port(preferred: Optional[str] = None) -> str:
+    """
+    自动查找常见单片机串口：
+      USB 转串口: /dev/ttyUSB*
+      Arduino/CDC: /dev/ttyACM*
+      树莓派 UART: /dev/ttyAMA0, /dev/serial0
+      稳定路径: /dev/serial/by-id/*
+    如果 preferred 存在，则优先使用 preferred。
+    """
+    candidates: List[Path] = []
+
+    if preferred:
+        p = Path(preferred)
+        if p.exists():
+            return str(p)
+        candidates.append(p)
+
+    by_id_dir = Path("/dev/serial/by-id")
+    if by_id_dir.exists():
+        candidates.extend(sorted(by_id_dir.glob("*")))
+
+    for pattern in (
+        "/dev/ttyUSB*",
+        "/dev/ttyACM*",
+        "/dev/serial0",
+        "/dev/ttyAMA0",
+        "/dev/ttyS0",
+    ):
+        candidates.extend(sorted(Path("/").glob(pattern.lstrip("/"))))
+
+    seen = set()
+    unique = []
+    for p in candidates:
+        sp = str(p)
+        if sp not in seen:
+            unique.append(p)
+            seen.add(sp)
+
+    for p in unique:
+        if p.exists():
+            return str(p)
+
+    checked = "\n  ".join(str(p) for p in unique) if unique else "无候选串口"
+    raise FileNotFoundError(
+        "没有找到可用串口。请先连接单片机，然后执行：\n"
+        "  ls -l /dev/ttyUSB* /dev/ttyACM* /dev/ttyAMA* /dev/serial/by-id/* 2>/dev/null\n"
+        "也可以手动指定，例如：\n"
+        "  --serial-port /dev/ttyUSB0\n"
+        f"已检查：\n  {checked}"
+    )
+
+
 # =========================================================
 # 日志
 # =========================================================
@@ -168,7 +239,7 @@ def load_class_mapping_5class(config_path: Path, logger: logging.Logger) -> Tupl
 
 def load_runtime_config(config_path: Optional[Path], logger: logging.Logger) -> Dict:
     defaults = {
-        "model_path": str(MODELS_DIR / "latest_tflite_float32.tflite"),
+        "model_path": str(_default_model_path()),
         "camera_device_index": CAMERA_INDEX_DEFAULT,
         "capture_width": CAPTURE_WIDTH, "capture_height": CAPTURE_HEIGHT,
         "confidence_threshold": CONF_THRESHOLD_DEFAULT,
@@ -182,7 +253,24 @@ def load_runtime_config(config_path: Optional[Path], logger: logging.Logger) -> 
         try:
             with open(config_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            m = data.get("model", {}); defaults["model_path"] = str(PROJECT_ROOT_DEFAULT / m["path"]) if m.get("path") else defaults["model_path"]
+            m = data.get("model", {})
+            if m.get("path"):
+                mp = m["path"]
+                mpath = Path(mp)
+                resolved = mpath if mpath.is_absolute() else PROJECT_ROOT_DEFAULT / mp
+
+                # 如果配置文件里仍然写的是 float16，自动切到 float32
+                if "float16" in resolved.name:
+                    float32_candidate = resolved.with_name(resolved.name.replace("float16", "float32"))
+                    if float32_candidate.exists():
+                        logger.warning("配置文件指向 float16，已自动改用 float32: %s", float32_candidate)
+                        resolved = float32_candidate
+
+                if resolved.exists():
+                    defaults["model_path"] = str(resolved)
+                else:
+                    logger.warning("配置模型文件不存在: %s，使用默认 float32 模型", resolved)
+                    defaults["model_path"] = str(_default_model_path())
             c = data.get("camera", {})
             for k in ("device_index","width","height","roi_enabled","roi"):
                 if k in c: defaults[f"camera_{k}" if k != "device_index" else "camera_device_index"] = c[k]
@@ -468,7 +556,7 @@ class VisionTriggerSortingApp:
         self.args = args
         self.cv2 = cv2_mod; self.np = np_mod
         self.project_root = Path(args.project_root).expanduser().resolve()
-        rc_path = Path(args.runtime_config).expanduser().resolve() if args.runtime_config else DEFAULT_RUNTIME_CONFIG
+        rc_path = Path(args.runtime_config).expanduser().resolve() if args.runtime_config else None
         self.runtime_cfg = load_runtime_config(rc_path, _dummy_logger())
         self.model_path = Path(args.model_path or self.runtime_cfg["model_path"]).expanduser().resolve()
         cc_path = args.class_config or str(DEFAULT_CLASS_CONFIG)
@@ -494,11 +582,14 @@ class VisionTriggerSortingApp:
         if not args.dry_run:
             self.classifier = GarbageClassifierTFLite(self.model_path, self.idx_to_class, self.logger, cv2_mod, np_mod, Interpreter_cls)
             if not args.no_serial:
-                sp = args.serial_port or self.runtime_cfg["serial_port"]
+                preferred_sp = args.serial_port or self.runtime_cfg.get("serial_port") or SERIAL_PORT_DEFAULT
+                sp = auto_detect_serial_port(preferred_sp)
                 br = args.baudrate if args.baudrate else int(self.runtime_cfg["serial_baudrate"])
+                self.logger.info("单片机串口: %s @ %d", sp, br)
                 self.serial_mgr = ServoCharSerial(sp, br, self.logger, serial_mod)
             if not args.preview_only or not args.no_window:
-                self.camera_mgr = CameraManager(int(self.runtime_cfg["camera_device_index"]), self.logger, cv2_mod)
+                cam_idx = int(args.camera_index if args.camera_index is not None else self.runtime_cfg["camera_device_index"])
+                self.camera_mgr = CameraManager(cam_idx, self.logger, cv2_mod)
 
         self.state = STATE_BOOT; self.full_flag = False
         self.error_count = 0; self.max_errors = 3
@@ -683,13 +774,23 @@ def dry_run_check(args) -> bool:
         except Exception as e: print(f"      错误: {e}"); return False
     mp = Path(args.model_path).expanduser().resolve() if args.model_path else None
     if mp is None:
-        rc = Path(args.runtime_config).expanduser().resolve() if args.runtime_config else DEFAULT_RUNTIME_CONFIG
-        if rc.exists():
-            cfg = load_runtime_config(rc, _dummy_logger()); mp = Path(cfg["model_path"]).expanduser().resolve()
-        else: mp = MODELS_DIR / "latest_tflite_float32.tflite"
+        if args.runtime_config:
+            rc = Path(args.runtime_config).expanduser().resolve()
+            if rc.exists():
+                cfg = load_runtime_config(rc, _dummy_logger())
+                mp = Path(cfg["model_path"]).expanduser().resolve()
+            else:
+                mp = _default_model_path()
+        else:
+            mp = _default_model_path()
     print(f"[3/4] TFLite 模型: {mp} 存在={mp.exists()}")
     sp = args.serial_port or SERIAL_PORT_DEFAULT
-    print(f"[4/4] 串口: {sp}")
+    try:
+        detected_sp = auto_detect_serial_port(sp)
+        print(f"[4/4] 串口: {detected_sp} 存在=True")
+    except Exception as e:
+        print(f"[4/4] 串口: {sp} 存在=False")
+        print(f"      提示: {e}")
     print("=" * 60); print("Dry-Run 完成。")
     if not mp.exists(): print("WARNING: 模型文件不存在，请先运行 04_Model_Export_Quantization 导出。")
     print("树莓派运行前请确认串口设备存在并已关闭串口终端。"); return True
@@ -701,7 +802,7 @@ def dry_run_check(args) -> bool:
 
 def test_char_mode(args, serial_mod):
     l = _dummy_logger(); l.handlers.clear(); l.addHandler(logging.StreamHandler(sys.stdout)); l.setLevel(logging.INFO)
-    sp = args.serial_port or SERIAL_PORT_DEFAULT
+    sp = auto_detect_serial_port(args.serial_port or SERIAL_PORT_DEFAULT)
     br = args.baudrate
     ser = ServoCharSerial(sp, br, l, serial_mod)
     ser.open()
@@ -723,7 +824,7 @@ def parse_args():
     p.add_argument("--project-root", default=str(PROJECT_ROOT_DEFAULT), help="项目根目录")
     p.add_argument("--model-path", default=None, help="TFLite 模型路径")
     p.add_argument("--class-config", default=str(DEFAULT_CLASS_CONFIG), help="class_mapping_5class.json 路径")
-    p.add_argument("--runtime-config", default=str(DEFAULT_RUNTIME_CONFIG), help="runtime_config.json 路径")
+    p.add_argument("--runtime-config", default=None, help="runtime_config.json 路径；默认不读取 example，避免旧配置覆盖模型/串口")
     p.add_argument("--serial-port", default=None, help="串口设备")
     p.add_argument("--baudrate", type=int, default=BAUDRATE_DEFAULT, help="波特率(9600)")
     p.add_argument("--camera-index", type=int, default=CAMERA_INDEX_DEFAULT, help="摄像头编号")
