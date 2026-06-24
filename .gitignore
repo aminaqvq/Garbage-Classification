@@ -41,11 +41,7 @@ garbage_dataset/logs/
 # ==========================================
 *.pt
 *.pth
-*.onnx
 *.pb
-
-# Keep export root-level model copies
-!export/latest_*
 
 # ==========================================
 # Training Outputs (large/runtime artifacts)
@@ -89,11 +85,3 @@ Garbage_Classification_Organized/garbage_dataset/test/**/*
 !Garbage_Classification_Organized/dataset/**/
 !Garbage_Classification_Organized/garbage_dataset/**/
 
-# ==========================================
-# Organized Path — Model Checkpoints
-# ==========================================
-Garbage_Classification_Organized/models/**/*.pt
-Garbage_Classification_Organized/models/**/*.pth
-Garbage_Classification_Organized/models/**/*.onnx
-Garbage_Classification_Organized/models/**/*.pb
-Garbage_Classification_Organized/models/**/saved_model/
