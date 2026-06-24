@@ -1,0 +1,18 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+D:\Garbage Classification\Garbage_Classification_Organized\09_Vision_Trigger_5Class_System\mcu\Vision_Trigger_5Class_System.uvproj
+Project File Date:  06/23/2026
+
+<h2>Output:</h2>
+Build target 'Ä¿±ê 1'
+assembling STARTUP.A51...
+compiling main.c...
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_SERVOSETANGLE?MAIN
+Program Size: data=14.5 xdata=0 code=630
+creating hex file from "Vision_Trigger_5Class_System"...
+"Vision_Trigger_5Class_System" - 0 Error(s), 1 Warning(s).

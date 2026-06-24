@@ -1,0 +1,86 @@
+version: "4.1"
+name: Vision_Trigger_5Class_System
+type: C51
+deviceName: null
+packDir: null
+srcDirs: []
+virtualFolder:
+  name: <virtual_root>
+  files: []
+  folders:
+    - name: Source Group 1
+      files:
+        - path: STARTUP.A51
+        - path: main.c
+      folders: []
+dependenceList: []
+outDir: build
+miscInfo:
+  uid: e1d212138d48eb7f293af82adac701aa
+targets:
+  Target 1:
+    cppPreprocessAttrs:
+      defineList: []
+      incList:
+        - ../../../../SoftWare/Keil.Vision5.MDKv518/C51/INC/Atmel
+      libList: []
+    excludeList: []
+    settings:
+      debugger: unknown
+    toolchain: Keil_C51
+    toolchainConfigMap:
+      Keil_C51:
+        options:
+          version: 2
+          afterBuildTasks: []
+          asm-compiler: {}
+          beforeBuildTasks: []
+          c/cpp-compiler:
+            optimization-level: level-8
+            optimization-type: SPEED
+          global:
+            ram-mode: SMALL
+            rom-mode: LARGE
+          linker:
+            misc-controls: ""
+            output-format: elf
+            remove-unused: true
+    uploadConfigMap:
+      Custom:
+        bin: ""
+        commandLine: python ./tools/stcflash.py -p ${port} "${programFile}"
+        eraseChipCommand: ""
+    uploader: Custom
+  目标 1:
+    cppPreprocessAttrs:
+      defineList: []
+      incList:
+        - ../../../../SoftWare/Keil.μVision5.C51v957/C51/INC/Atmel
+      libList: []
+    excludeList: []
+    settings:
+      debugger: unknown
+    toolchain: Keil_C51
+    toolchainConfigMap:
+      Keil_C51:
+        options:
+          version: 2
+          afterBuildTasks: []
+          asm-compiler: {}
+          beforeBuildTasks: []
+          c/cpp-compiler:
+            optimization-level: level-8
+            optimization-type: SPEED
+          global:
+            ram-mode: SMALL
+            rom-mode: LARGE
+          linker:
+            misc-controls: ""
+            output-format: elf
+            remove-unused: true
+    uploadConfigMap:
+      Custom:
+        bin: ""
+        commandLine: python ./tools/stcflash.py -p ${port} "${programFile}"
+        eraseChipCommand: ""
+    uploader: Custom

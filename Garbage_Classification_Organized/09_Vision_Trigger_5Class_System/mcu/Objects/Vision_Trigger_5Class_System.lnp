@@ -1,0 +1,4 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj" 
+TO ".\Objects\Vision_Trigger_5Class_System" 
+PRINT(".\Listings\Vision_Trigger_5Class_System.m51") RAMSIZE(256) 

@@ -1,0 +1,379 @@
+C51 COMPILER V9.57.0.0   MAIN                                                              06/23/2026 17:37:18 PAGE 1   
+
+
+C51 COMPILER V9.57.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\SoftWare\Keil.��Vision5.C51v957\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*********************************************************************
+   2           * STC89C52RC 最终单片机固件 — 五分类视觉触发版
+   3           *
+   4           * 功能：
+   5           *   接收树莓派 R/K/H/O 分类命令
+   6           *   控制舵机角度 + 电机推出/回位
+   7           *   满载传感器检测 (L0-L3) + F/N 反馈
+   8           *   分拣完成后发送 D
+   9           *   非法字符发送 E
+  10           *   满载时禁止动作并返回 F
+  11           *
+  12           * 协议（ASCII 单字符）：
+  13           *   RPi → MCU:  R(可回收) K(厨余) H(有害) O(其他)
+  14           *   MCU → RPi:  D(完成) F(满载) N(恢复) E(错误)
+  15           *
+  16           * 重要约束：
+  17           *   1. P0 口开漏结构，作为普通 IO 需外部上拉电阻（4.7k~10kΩ）
+  18           *   2. 舵机/电机必须独立供电（不要从 52RC 取电）
+  19           *   3. 树莓派 GPIO 3.3V，52RC 5V，UART 需电平转换模块
+  20           *   4. 不含 HC-SR04 超声波，不含 T 触发逻辑
+  21           *   5. 兼容 Keil C51，所有局部变量在函数开头声明
+  22           *
+  23           * 部署目录：09_Vision_Trigger_5Class_System/mcu/
+  24           *********************************************************************/
+  25          
+  26          #include <REGX52.H>
+  27          
+  28          /* ── 类型定义 ───────────────────────────�
+             -�── */
+  29          typedef unsigned char  u8;
+  30          typedef unsigned int   u16;
+  31          
+  32          /* ── 引脚定义 ───────────────────────────�
+             -�── */
+  33          /* 直流电机驱动 (L298N / L9110S) */
+  34          sbit MOTOR_EN  = P0^0;   /* 使能 */
+  35          sbit MOTOR_IN1 = P0^1;   /* 方向 1 */
+  36          sbit MOTOR_IN2 = P0^2;   /* 方向 2 */
+  37          
+  38          /* 舵机 PWM (软件 PWM 使用 Timer0 中断) */
+  39          sbit SERVO = P1^5;
+  40          
+  41          /* 满载传感器 — 低电平触发（遮挡/满载时传感器输出低电平）
+  42           * ⚠ P0 口开漏，必须外部上拉 4.7k~10kΩ 到 VCC */
+  43          sbit FULL_L0 = P0^3;
+  44          sbit FULL_L1 = P0^5;
+  45          sbit FULL_L2 = P0^6;
+  46          sbit FULL_L3 = P0^7;
+  47          
+  48          /* ── 协议字符定义 ─────────────────────────�
+             -� */
+  49          #define MCU_DONE_CHAR    'D'   /* 分拣完成 */
+  50          #define MCU_FULL_CHAR    'F'   /* 满载暂停 */
+  51          #define MCU_NORMAL_CHAR  'N'   /* 满载解除 */
+  52          #define MCU_ERROR_CHAR   'E'   /* 错误 */
+C51 COMPILER V9.57.0.0   MAIN                                                              06/23/2026 17:37:18 PAGE 2   
+
+  53          
+  54          /* ── 舵机角度定义 (PWM 脉宽值) ──────────── */
+  55          /* 注意：角度值需根据实际舵机微调！ */
+  56          #define SERVO_RECOVERABLE_PWM   8    /* 可回收 */
+  57          #define SERVO_HARMFUL_PWM      19    /* 有害   */
+  58          #define SERVO_KITCHEN_PWM      29    /* 厨余   */
+  59          #define SERVO_OTHER_PWM        36    /* 其他   */
+  60          #define SERVO_HOME_PWM         10    /* 回中位 */
+  61          
+  62          /* ── 系统参数 ───────────────────────────�
+             -�── */
+  63          #define FULL_DEBOUNCE_MS       50    /* 满载消抖毫秒 */
+  64          #define DOOR_OPEN_MS         1000    /* 开门时间 */
+  65          #define DOOR_STOP_MS         1000    /* 停止时间 */
+  66          #define DOOR_CLOSE_MS        1000    /* 关门时间 */
+  67          #define SERVO_HOLD_MS         500    /* 舵机保持时间 */
+  68          
+  69          /* ── 全局变量 ───────────────────────────�
+             -�── */
+  70          volatile u8   uart_rx_char = 0;
+  71          volatile bit  uart_rx_flag = 0;
+  72          
+  73          unsigned int  servo_cnt = 0;
+  74          unsigned int  servo_pwm = 10;     /* 当前舵机 PWM 值 */
+  75          
+  76          bit  full_flag      = 0;          /* 当前满载状态 */
+  77          bit  last_full_raw  = 0;          /* 上次满载原始值（消抖用） */
+  78          
+  79          /* ── 函数声明 ───────────────────────────�
+             -�── */
+  80          void DelayMs(u16 ms);
+  81          void Uart_Init(void);
+  82          void Uart_SendByte(u8 dat);
+  83          bit  IsFullRaw(void);
+  84          void CheckFullLoad(void);
+  85          void MotorStop(void);
+  86          void MotorOpen(void);
+  87          void MotorClose(void);
+  88          u8   ServoPwmByClassChar(u8 ch);
+  89          void ServoSetAngle(u8 pwm_val);
+  90          void ServoHoldMs(u8 pwm_val, u16 ms);
+  91          void SortAction(u8 ch);
+  92          void ProcessUartCommand(void);
+  93          
+  94          /* ── 延时 ─────────────────────────────�
+             -�──── */
+  95          void DelayMs(u16 ms)
+  96          {
+  97   1          u16 i, j;
+  98   1          for (i = ms; i > 0; i--)
+  99   1              for (j = 110; j > 0; j--);
+ 100   1      }
+ 101          
+ 102          /* ── 串口初始化 (Timer1, 9600bps@11.0592MHz) */
+ 103          void Uart_Init(void)
+ 104          {
+ 105   1          TMOD |= 0x20;         /* T1 模式2，8位自动重装 */
+ 106   1          TH1   = 0xFD;         /* 9600 bps */
+ 107   1          TL1   = 0xFD;
+ 108   1          TR1   = 1;
+ 109   1          SCON  = 0x50;         /* 模式1，允许接收 */
+ 110   1          EA    = 1;
+C51 COMPILER V9.57.0.0   MAIN                                                              06/23/2026 17:37:18 PAGE 3   
+
+ 111   1          ES    = 1;
+ 112   1          TI    = 0;
+ 113   1          RI    = 0;
+ 114   1      }
+ 115          
+ 116          /* ── 定时器0初始化（舵机 PWM，50Hz）─────── */
+ 117          void Timer0_Init(void)
+ 118          {
+ 119   1          TMOD &= 0xF0;
+ 120   1          TMOD |= 0x01;         /* T0 模式1，16位 */
+ 121   1          TH0   = 0xFF;
+ 122   1          TL0   = 0xD2;         /* ≈50us 周期 */
+ 123   1          ET0   = 1;
+ 124   1          EA    = 1;
+ 125   1          TR0   = 1;
+ 126   1      }
+ 127          
+ 128          /* ── 定时器0中断：舵机 PWM ───────────────── */
+ 129          void Timer0_ISR(void) interrupt 1
+ 130          {
+ 131   1          TH0 = 0xFF;
+ 132   1          TL0 = 0xD2;
+ 133   1          servo_cnt++;
+ 134   1      
+ 135   1          if (servo_cnt <= servo_pwm)
+ 136   1              SERVO = 1;
+ 137   1          else
+ 138   1              SERVO = 0;
+ 139   1      
+ 140   1          if (servo_cnt >= 400) {
+ 141   2              servo_cnt = 0;
+ 142   2              SERVO = 1;
+ 143   2          }
+ 144   1      }
+ 145          
+ 146          /* ── 串口发送 ───────────────────────────�
+             -�── */
+ 147          void Uart_SendByte(u8 dat)
+ 148          {
+ 149   1          bit saved_es;
+ 150   1          saved_es = ES;
+ 151   1          ES = 0;
+ 152   1          SBUF = dat;
+ 153   1          while (TI == 0);
+ 154   1          TI = 0;
+ 155   1          ES = saved_es;
+ 156   1      }
+ 157          
+ 158          /* ── 串口中断：只接收 ────────────────────── */
+ 159          void Uart_IRQ(void) interrupt 4
+ 160          {
+ 161   1          if (RI) {
+ 162   2              RI = 0;
+ 163   2              uart_rx_char = SBUF;
+ 164   2              uart_rx_flag = 1;
+ 165   2          }
+ 166   1      }
+ 167          
+ 168          /* ── 满载传感器原始读取 ──────────────────── */
+ 169          /* 低电平触发：任意一个传感器为 0 → 满载 */
+ 170          bit IsFullRaw(void)
+ 171          {
+C51 COMPILER V9.57.0.0   MAIN                                                              06/23/2026 17:37:18 PAGE 4   
+
+ 172   1          if (FULL_L0 == 0 || FULL_L1 == 0 || FULL_L2 == 0 || FULL_L3 == 0)
+ 173   1              return 1;
+ 174   1          else
+ 175   1              return 0;
+ 176   1      }
+ 177          
+ 178          /* ── 满载检测与 F/N 发送 ─────────────────── */
+ 179          void CheckFullLoad(void)
+ 180          {
+ 181   1          bit raw;
+ 182   1          raw = IsFullRaw();
+ 183   1      
+ 184   1          if (raw != last_full_raw) {
+ 185   2              DelayMs(FULL_DEBOUNCE_MS);      /* 消抖 */
+ 186   2              raw = IsFullRaw();
+ 187   2          }
+ 188   1      
+ 189   1          if (raw != last_full_raw) {
+ 190   2              last_full_raw = raw;
+ 191   2      
+ 192   2              if (raw == 1 && full_flag == 0) {
+ 193   3                  /* 从未满载 → 满载 */
+ 194   3                  full_flag = 1;
+ 195   3                  MotorStop();
+ 196   3                  Uart_SendByte(MCU_FULL_CHAR);
+ 197   3              }
+ 198   2              else if (raw == 0 && full_flag == 1) {
+ 199   3                  /* 从满载 → 恢复正常 */
+ 200   3                  full_flag = 0;
+ 201   3                  Uart_SendByte(MCU_NORMAL_CHAR);
+ 202   3              }
+ 203   2          }
+ 204   1      }
+ 205          
+ 206          /* ── 电机控制 ───────────────────────────�
+             -�── */
+ 207          void MotorStop(void)
+ 208          {
+ 209   1          MOTOR_EN  = 0;
+ 210   1          MOTOR_IN1 = 0;
+ 211   1          MOTOR_IN2 = 0;
+ 212   1      }
+ 213          
+ 214          void MotorOpen(void)
+ 215          {
+ 216   1          MOTOR_EN  = 1;
+ 217   1          MOTOR_IN1 = 1;
+ 218   1          MOTOR_IN2 = 0;
+ 219   1          DelayMs(DOOR_OPEN_MS);
+ 220   1          MotorStop();
+ 221   1          DelayMs(DOOR_STOP_MS);
+ 222   1      }
+ 223          
+ 224          void MotorClose(void)
+ 225          {
+ 226   1          MOTOR_EN  = 1;
+ 227   1          MOTOR_IN1 = 0;
+ 228   1          MOTOR_IN2 = 1;
+ 229   1          DelayMs(DOOR_CLOSE_MS);
+ 230   1          MotorStop();
+ 231   1      }
+ 232          
+C51 COMPILER V9.57.0.0   MAIN                                                              06/23/2026 17:37:18 PAGE 5   
+
+ 233          /* ── 舵机角度映射 ─────────────────────────�
+             -� */
+ 234          u8 ServoPwmByClassChar(u8 ch)
+ 235          {
+ 236   1          if (ch == 'R')      return SERVO_RECOVERABLE_PWM;
+ 237   1          else if (ch == 'H') return SERVO_HARMFUL_PWM;
+ 238   1          else if (ch == 'K') return SERVO_KITCHEN_PWM;
+ 239   1          else if (ch == 'O') return SERVO_OTHER_PWM;
+ 240   1          return SERVO_HOME_PWM;
+ 241   1      }
+ 242          
+ 243          /* ── 舵机设置角度 ─────────────────────────�
+             -� */
+ 244          void ServoSetAngle(u8 pwm_val)
+ 245          {
+ 246   1          servo_pwm = pwm_val;
+ 247   1      }
+ 248          
+ 249          /* ── 舵机保持指定时间 ────────────────────── */
+ 250          void ServoHoldMs(u8 pwm_val, u16 ms)
+ 251          {
+ 252   1          servo_pwm = pwm_val;
+ 253   1          DelayMs(ms);
+ 254   1      }
+ 255          
+ 256          /* ── 分拣动作 ───────────────────────────�
+             -�── */
+ 257          void SortAction(u8 ch)
+ 258          {
+ 259   1          u8 pwm;
+ 260   1          pwm = ServoPwmByClassChar(ch);
+ 261   1      
+ 262   1          /* 1. 舵机转向对应垃圾桶 */
+ 263   1          ServoHoldMs(pwm, SERVO_HOLD_MS);
+ 264   1          DelayMs(300);
+ 265   1      
+ 266   1          /* 2. 电机推出 */
+ 267   1          MotorOpen();
+ 268   1      
+ 269   1          /* 3. 舵机回中位 */
+ 270   1          ServoHoldMs(SERVO_HOME_PWM, SERVO_HOLD_MS);
+ 271   1          DelayMs(200);
+ 272   1      
+ 273   1          /* 4. 电机关门 */
+ 274   1          MotorClose();
+ 275   1      }
+ 276          
+ 277          /* ── 处理串口命令 ─────────────────────────�
+             -� */
+ 278          void ProcessUartCommand(void)
+ 279          {
+ 280   1          u8 ch;
+ 281   1      
+ 282   1          if (uart_rx_flag == 0)
+ 283   1              return;
+ 284   1      
+ 285   1          uart_rx_flag = 0;
+ 286   1          ch = uart_rx_char;
+ 287   1      
+ 288   1          /* 忽略 MCU 自己发送的 F/N/D/E 回显 */
+ 289   1          if (ch == MCU_FULL_CHAR || ch == MCU_NORMAL_CHAR ||
+ 290   1              ch == MCU_DONE_CHAR || ch == MCU_ERROR_CHAR) {
+C51 COMPILER V9.57.0.0   MAIN                                                              06/23/2026 17:37:18 PAGE 6   
+
+ 291   2              return;
+ 292   2          }
+ 293   1      
+ 294   1          /* 合法分类命令：R / K / H / O */
+ 295   1          if (ch == 'R' || ch == 'H' || ch == 'K' || ch == 'O') {
+ 296   2              if (full_flag == 1) {
+ 297   3                  /* 满载：禁止动作，返回 F */
+ 298   3                  MotorStop();
+ 299   3                  Uart_SendByte(MCU_FULL_CHAR);
+ 300   3                  return;
+ 301   3              }
+ 302   2      
+ 303   2              /* 未满载：执行分拣动作 */
+ 304   2              SortAction(ch);
+ 305   2      
+ 306   2              /* 动作完成后发送 D */
+ 307   2              Uart_SendByte(MCU_DONE_CHAR);
+ 308   2              return;
+ 309   2          }
+ 310   1      
+ 311   1          /* 非法字符：发送 E */
+ 312   1          Uart_SendByte(MCU_ERROR_CHAR);
+ 313   1      }
+ 314          
+ 315          /* ── 主函数 ────────────────────────────�
+             -�─── */
+ 316          void main(void)
+ 317          {
+ 318   1          /* 初始化 */
+ 319   1          Timer0_Init();
+ 320   1          Uart_Init();
+ 321   1      
+ 322   1          /* 硬件初始状态 */
+ 323   1          SERVO     = 1;
+ 324   1          MOTOR_EN  = 0;
+ 325   1          full_flag     = 0;
+ 326   1          last_full_raw = IsFullRaw();
+ 327   1      
+ 328   1          while (1) {
+ 329   2              CheckFullLoad();         /* 检测满载/恢复，必要时发送 F/N */
+ 330   2              ProcessUartCommand();    /* 处理树莓派发来的 R/H/K/O */
+ 331   2          }
+ 332   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    463    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      3       2
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

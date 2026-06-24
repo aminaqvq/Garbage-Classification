@@ -23,7 +23,7 @@
  * 部署目录：09_Vision_Trigger_5Class_System/mcu/
  *********************************************************************/
 
-#include <REGX52.H>
+#include <REG52.H>
 
 /* ── 类型定义 ────────────────────────────── */
 typedef unsigned char  u8;
