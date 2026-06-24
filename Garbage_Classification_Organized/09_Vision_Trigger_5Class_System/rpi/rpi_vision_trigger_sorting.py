@@ -48,20 +48,21 @@ DEFAULT_RUNTIME_CONFIG = CONFIG_DIR / "runtime_config.example.json"
 def _default_model_path() -> Path:
     """
     树莓派 + tflite_runtime 稳定版：
-    只允许默认加载 float32 模型，禁止自动回退到 float16，
-    避免 CONV_2D 在 allocate_tensors() 阶段报 input_type 错误。
+    优先加载 latest_tflite_float32.tflite（最常见的导出命名），
+    回退到 model_float32_simplified_float32.tflite。
+    禁止加载 float16 模型，避免 CONV_2D allocate_tensors 阶段报 input_type 错误。
     """
     candidates = [
-        MODELS_DIR / "model_float32_simplified_float32.tflite",
         MODELS_DIR / "latest_tflite_float32.tflite",
+        MODELS_DIR / "model_float32_simplified_float32.tflite",
     ]
     for p in candidates:
         if p.exists():
             return p
     raise FileNotFoundError(
         "未找到 float32 TFLite 模型文件。请确认存在：\n"
-        f"  {MODELS_DIR / 'model_float32_simplified_float32.tflite'}\n"
-        f"或：\n  {MODELS_DIR / 'latest_tflite_float32.tflite'}"
+        f"  {MODELS_DIR / 'latest_tflite_float32.tflite'}\n"
+        f"  {MODELS_DIR / 'model_float32_simplified_float32.tflite'}"
     )
 
 SERIAL_PORT_DEFAULT = "/dev/ttyAMA0"

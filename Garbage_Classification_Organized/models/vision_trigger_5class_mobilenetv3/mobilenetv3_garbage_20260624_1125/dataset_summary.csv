@@ -1,0 +1,16 @@
+﻿split,class_name,count
+train,待分拣,368
+train,其他,325
+train,厨余,196
+train,可回收,214
+train,有害,396
+val,待分拣,78
+val,其他,69
+val,厨余,42
+val,可回收,45
+val,有害,85
+test,待分拣,80
+test,其他,71
+test,厨余,42
+test,可回收,47
+test,有害,86

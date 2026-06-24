@@ -103,22 +103,10 @@ def check_image_valid(path: Path):
 
 
 def prepare_output_dir(output_dir: Path, clean_output: bool = False) -> Path:
-    if clean_output:
-        if output_dir.exists():
-            shutil.rmtree(output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
-        print(f"已清空并重建目录：{output_dir.resolve()}")
-        return output_dir
-    if not output_dir.exists():
-        output_dir.mkdir(parents=True, exist_ok=True)
-        return output_dir
-    # 输出目录已存在且未指定 --clean-output：自动创建带时间戳的新目录，避免数据覆盖
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_output_dir = output_dir.parent / f"{output_dir.name}_{timestamp}"
-    new_output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"输出目录已存在，自动创建新目录：{new_output_dir.resolve()}")
-    print(f"（如需覆盖原目录，请使用 --clean-output）")
-    return new_output_dir
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    return output_dir
 
 
 def create_split_folders(output_dir: Path, class_names):

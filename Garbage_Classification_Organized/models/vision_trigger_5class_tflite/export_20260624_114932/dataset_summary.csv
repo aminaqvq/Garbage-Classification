@@ -1,0 +1,11 @@
+﻿split,class_idx,class_name,count
+test,0,待分拣,80
+test,1,其他,71
+test,2,厨余,42
+test,3,可回收,47
+test,4,有害,86
+calibration,0,待分拣,100
+calibration,1,其他,100
+calibration,2,厨余,100
+calibration,3,可回收,100
+calibration,4,有害,100

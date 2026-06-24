@@ -1,0 +1,110 @@
+{
+    "accuracy": 0.9467084639498433,
+    "loss": 0.45576901831970695,
+    "classification_report": {
+        "待分拣": {
+            "precision": 1.0,
+            "recall": 0.9871794871794872,
+            "f1-score": 0.9935483870967742,
+            "support": 78.0
+        },
+        "其他": {
+            "precision": 0.9285714285714286,
+            "recall": 0.9420289855072463,
+            "f1-score": 0.935251798561151,
+            "support": 69.0
+        },
+        "厨余": {
+            "precision": 0.9534883720930233,
+            "recall": 0.9761904761904762,
+            "f1-score": 0.9647058823529412,
+            "support": 42.0
+        },
+        "可回收": {
+            "precision": 0.8653846153846154,
+            "recall": 1.0,
+            "f1-score": 0.9278350515463918,
+            "support": 45.0
+        },
+        "有害": {
+            "precision": 0.961038961038961,
+            "recall": 0.8705882352941177,
+            "f1-score": 0.9135802469135802,
+            "support": 85.0
+        },
+        "accuracy": 0.9467084639498433,
+        "macro avg": {
+            "precision": 0.9416966754176057,
+            "recall": 0.9551974368342655,
+            "f1-score": 0.9469842732941677,
+            "support": 319.0
+        },
+        "weighted avg": {
+            "precision": 0.9490550457051877,
+            "recall": 0.9467084639498433,
+            "f1-score": 0.9465633030104491,
+            "support": 319.0
+        }
+    },
+    "confusion_matrix": [
+        [
+            77,
+            1,
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            65,
+            0,
+            2,
+            2
+        ],
+        [
+            0,
+            0,
+            41,
+            0,
+            1
+        ],
+        [
+            0,
+            0,
+            0,
+            45,
+            0
+        ],
+        [
+            0,
+            4,
+            2,
+            5,
+            74
+        ]
+    ],
+    "precision_per_class": {
+        "待分拣": 1.0,
+        "其他": 0.9286,
+        "厨余": 0.9535,
+        "可回收": 0.8654,
+        "有害": 0.961
+    },
+    "recall_per_class": {
+        "待分拣": 0.9872,
+        "其他": 0.942,
+        "厨余": 0.9762,
+        "可回收": 1.0,
+        "有害": 0.8706
+    },
+    "pending_recall": 0.9872,
+    "garbage_macro_precision": 0.9271,
+    "pending_false_trigger_count": 1,
+    "garbage_to_pending_count": 0,
+    "classification_report_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_1125\\val_classification_report.txt",
+    "classification_report_json": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_1125\\val_classification_report.json",
+    "confusion_matrix_csv": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_1125\\val_confusion_matrix.csv",
+    "confusion_matrix_png": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_1125\\val_confusion_matrix.png",
+    "confusion_matrix_txt": "D:\\Garbage Classification\\Garbage_Classification_Organized\\models\\vision_trigger_5class_mobilenetv3\\mobilenetv3_garbage_20260624_1125\\val_confusion_matrix.txt",
+    "confusion_matrix_text": "混淆矩阵（行=真实类别，列=预测类别）\n\n真实\\预测     待分拣      其他      厨余     可回收      有害    |    总计       recall\n---------------------------------------------------------------------\n待分拣        77      1       0       0       0     |    78        0.987\n其他         0       65      0       2       2     |    69        0.942\n厨余         0       0       41      0       1     |    42        0.976\n可回收        0       0       0       45      0     |    45        1.000\n有害         0       4       2       5       74    |    85        0.871\n---------------------------------------------------------------------\n预测总计       77      70      43      52      77    |   319   \nprecision 1.000   0.929   0.953   0.865   0.961  "
+}

@@ -180,13 +180,13 @@ IMAGE_SIZE = 224
 # =========================================================
 
 def now_str():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now().strftime("%Y-%m-%d %H:%M:")
 
 
 def make_run_dir(output_base=None):
     if output_base is None:
         output_base = OUTPUT_ROOT
-    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_id = datetime.now().strftime("%Y%m%d_%H%M")
     run_dir = Path(output_base) / f"mobilenetv3_garbage_{run_id}"
     run_dir.mkdir(parents=True, exist_ok=True)
     return run_dir
@@ -199,7 +199,7 @@ def setup_logger(run_dir: Path):
     logger.handlers.clear()
     formatter = logging.Formatter(
         fmt="%(asctime)s | %(levelname)s | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
+        datefmt="%Y-%m-%d %H:%M:"
     )
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
