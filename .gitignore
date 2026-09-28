@@ -84,4 +84,5 @@ Garbage_Classification_Organized/garbage_dataset/test/**/*
 # Keep dataset directory structure
 !Garbage_Classification_Organized/dataset/**/
 !Garbage_Classification_Organized/garbage_dataset/**/
-
+Garbage_Classification_Organized/Logs/*
+Garbage_Classification_Organized/Captures_Vision_Trigger/*

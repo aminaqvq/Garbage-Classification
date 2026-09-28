@@ -59,14 +59,14 @@ python 09_Vision_Trigger_5Class_System/rpi/rpi_vision_trigger_sorting.py --dry-r
 # 仅预览识别（不发送串口）
 python 09_Vision_Trigger_5Class_System/rpi/rpi_vision_trigger_sorting.py --preview-only
 
-# 完整运行（摄像头 + 串口 + 状态机）
+# 完整运行（摄像头 + GPIO14/15 UART + 状态机）
 python 09_Vision_Trigger_5Class_System/rpi/rpi_vision_trigger_sorting.py
 
 # 无窗口模式（SSH 运行）
 python 09_Vision_Trigger_5Class_System/rpi/rpi_vision_trigger_sorting.py --no-window
 
-# 手动测试单个字符
-python 09_Vision_Trigger_5Class_System/rpi/rpi_vision_trigger_sorting.py --test-char R
+# 手动测试单个字符（会驱动真实舵机/舱门）
+python 09_Vision_Trigger_5Class_System/rpi/rpi_vision_trigger_sorting.py --test-char R --serial-port /dev/ttyAMA0
 
 # 串口调试工具
 python 06_RKHO_Serial_Protocol_Test/rpi_manual_rkho_protocol_test.py --serial-port /dev/ttyUSB0
@@ -90,7 +90,7 @@ python 06_RKHO_Serial_Protocol_Test/rpi_manual_rkho_protocol_test.py --serial-po
 │   ├── rpi_vision_trigger_sorting.py   ← ★ 最终树莓派运行脚本
 │   └── README.md
 ├── mcu/
-│   ├── mcu_vision_trigger_full_load_rkho.c  ← ★ 最终 MCU 固件
+│   ├── main.c                               ← ★ 最终 MCU 固件
 │   └── README.md
 ├── tests/
 │   └── README.md
@@ -106,14 +106,25 @@ BOOT → IDLE_WAIT_VISUAL → CANDIDATE_DETECTED → SEND_SORT_COMMAND
 → WAIT_MCU_DONE → WAIT_RETURN_TO_PENDING → IDLE_WAIT_VISUAL
 
 任意状态收到 F → FULL_PAUSED → 收到 N → IDLE_WAIT_VISUAL
-收到 E 或 D 超时 → ERROR_RECOVERY → IDLE_WAIT_VISUAL
+收到 E 或 D 超时 → ERROR_RECOVERY → 锁定退出，人工检查后重启
 ```
 
 详见 `state_machine_design.md`。
 
 ---
 
-## 7. 训练到部署流程
+## 7. 当前运行约束
+
+- Raspberry Pi GPIO14/GPIO15 UART 使用 `/dev/ttyAMA0`，9600 bps。
+- `/dev/serial0` 在 Raspberry Pi 5 上可能指向专用调试 UART，不作为本系统默认端口。
+- MCU 固件动作时序约 11 秒，`done_timeout_seconds` 默认 15 秒，不应恢复为 8 秒。
+- MCU 上电不主动发送初始 `F/N`；RPi 启动默认按未满载运行，收到 `F` 后暂停，收到 `N` 后恢复。
+- MCU 上电时如果实际已满载，固定固件无法主动报告；该风险只能通过现场确认或修改固件消除。
+- 串口异常、`E` 或 `D` 超时会锁定退出，避免不确定状态下自动重发动作。
+
+---
+
+## 8. 训练到部署流程
 
 ```
 01_Dataset_Collection     → 采集五分类图片（含「待分拣」）
@@ -125,9 +136,9 @@ BOOT → IDLE_WAIT_VISUAL → CANDIDATE_DETECTED → SEND_SORT_COMMAND
 
 ---
 
-## 8. MCU 固件烧录
+## 9. MCU 固件烧录
 
-使用 STC-ISP 软件将 `mcu/mcu_vision_trigger_full_load_rkho.c` 编译并烧录到 STC89C52RC。
+使用 STC-ISP 软件将 `mcu/main.c` 编译并烧录到 STC89C52RC。
 
 Keil C51 编译注意事项：
 - 选择芯片：STC89C52RC
@@ -136,7 +147,7 @@ Keil C51 编译注意事项：
 
 ---
 
-## 9. 旧版对比
+## 10. 旧版对比
 
 | 对比维度 | 旧版（超声波触发） | 新版（视觉触发） |
 |----------|-------------------|-----------------|

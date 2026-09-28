@@ -50,7 +50,7 @@
 2. **电机/舵机独立供电**：不要从 52RC 或树莓派取电，否则可能复位或烧毁。
 3. **共地**：树莓派、52RC、舵机电源、电机电源的 GND 必须连接在一起。
 4. **3.3V/5V 电平转换**：树莓派 UART 是 3.3V，52RC 是 5V，必须加电平转换。
-5. **串口终端**：树莓派运行脚本前必须关闭 `serial-getty@ttyAMA0.service`（或 ttyS0）。
+5. **串口设备**：树莓派 GPIO14/15 使用 `/dev/ttyAMA0`，9600 bps；运行脚本前必须关闭 `serial-getty@ttyAMA0.service`。本系统不默认使用 `/dev/serial0`，因为 Raspberry Pi 5 上它可能指向专用调试 UART。
 
 ## 6. 已移除的硬件
 

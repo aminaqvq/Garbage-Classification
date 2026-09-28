@@ -18,7 +18,7 @@
 | **WAIT_MCU_DONE** | 等待 MCU 完成：等待 MCU 返回 D（分拣完成），带超时保护 |
 | **WAIT_RETURN_TO_PENDING** | 等待回到待分拣：等待画面稳定回到「待分拣」状态后才允许下一轮 |
 | **FULL_PAUSED** | 满载暂停：MCU 返回 F，树莓派暂停所有分拣命令 |
-| **ERROR_RECOVERY** | 错误恢复：MCU 返回 E 或超时，进入错误恢复逻辑 |
+| **ERROR_RECOVERY** | 故障锁定：MCU 返回 E、串口异常或 D 超时后停止继续动作，人工检查后重启 |
 
 ---
 
@@ -87,7 +87,7 @@
 ### 规则 4：发送后必须等待 D 或进入超时保护
 发送 R/K/H/O 后进入 **WAIT_MCU_DONE**：
 - 收到 `D` → 进入 **WAIT_RETURN_TO_PENDING**
-- 超时（默认 8 秒）→ 进入 **ERROR_RECOVERY**
+- 超时（默认 15 秒）→ 进入 **ERROR_RECOVERY**，锁定退出
 
 ### 规则 5：发送后必须等待画面回到「待分拣」才允许下一次分拣
 **WAIT_RETURN_TO_PENDING** 状态下持续推理，只有当模型连续稳定输出「待分拣」（默认 ≥8 帧）后才转回 **IDLE_WAIT_VISUAL**。  
@@ -125,7 +125,7 @@ MCU 不再搭载 HC-SR04 超声波传感器，不再运行 `UltrasonicMeasureCm(
 | IDLE_WAIT_VISUAL | 收到 `F` | FULL_PAUSED |
 | CANDIDATE_DETECTED | 收到 `F` | FULL_PAUSED |
 | FULL_PAUSED | 收到 `N` | IDLE_WAIT_VISUAL |
-| ERROR_RECOVERY | 恢复策略完成 | IDLE_WAIT_VISUAL |
+| ERROR_RECOVERY | 人工检查并重启程序 | BOOT |
 
 ---
 
@@ -147,3 +147,5 @@ MCU 不再搭载 HC-SR04 超声波传感器，不再运行 `UltrasonicMeasureCm(
 - 状态机逻辑将在 `rpi/` 目录中实现为 Python 类 `VisionTriggerStateMachine`
 - 需要与 `runtime_config.example.json` 中的 decision 参数联动
 - MCU 侧固件不需要实现状态机，MCU 只需响应单字符命令并返回 D/F/N/E
+- MCU 上电不发送初始 F/N；RPi 启动默认按未满载运行，收到 F 后暂停，收到 N 后恢复
+- Raspberry Pi GPIO14/15 使用 `/dev/ttyAMA0`，不要默认使用可能指向调试 UART 的 `/dev/serial0`
