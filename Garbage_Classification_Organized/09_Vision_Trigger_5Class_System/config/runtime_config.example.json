@@ -21,10 +21,10 @@
     "stable_frames_required": 5,
     "return_to_pending_frames_required": 8,
     "send_cooldown_seconds": 3.0,
-    "done_timeout_seconds": 8.0
+    "done_timeout_seconds": 15.0
   },
   "serial": {
-    "port": "/dev/ttyUSB0",
+    "port": "/dev/ttyAMA0",
     "baudrate": 9600,
     "timeout_seconds": 0.1
   },
