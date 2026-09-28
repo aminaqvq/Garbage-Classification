@@ -843,6 +843,7 @@ class VisionTriggerSortingApp:
         self.running = True; self.round_id = 0
         self.last_send_time = None; self.mcu_done_wait_start = None
         self.candidate_result = None
+        self.paused_from_state = None
         self.roi_enabled = bool(self.runtime_cfg["roi_enabled"])
         self.roi = dict(self.runtime_cfg["roi"])
         self.last_frame_time = time.monotonic(); self.fps = 0.0
@@ -886,6 +887,7 @@ class VisionTriggerSortingApp:
             self.serial_rx_text = f"RX '{ch}' / 0x{b:02X}"
             self.logger.info("[MCU] %s", self.serial_rx_text)
             if ch == 'F':
+                self.paused_from_state = self.state
                 self.full_flag = True; self.mcu_status_known = True
                 self.state = STATE_FULL_PAUSED
                 self.stable_predictor.reset(); self.pending_predictor.reset(); self.candidate_result = None
@@ -893,7 +895,14 @@ class VisionTriggerSortingApp:
             elif ch == 'N':
                 if self.state == STATE_FULL_PAUSED and self.full_flag:
                     self.full_flag = False; self.mcu_status_known = True
-                    self.state = STATE_ERROR_RECOVERY if self.fault_latched else STATE_IDLE_WAIT_VISUAL
+                    self.state = (
+                        STATE_ERROR_RECOVERY
+                        if self.fault_latched
+                        else STATE_WAIT_RETURN_TO_PENDING
+                        if self.paused_from_state == STATE_WAIT_RETURN_TO_PENDING
+                        else STATE_IDLE_WAIT_VISUAL
+                    )
+                    self.paused_from_state = None
                     self.stable_predictor.reset(); self.pending_predictor.reset(); self.candidate_result = None
                     self.logger.info("满载解除"); self._csv("mcu_normal", rx_hex=hex_str(bytes([b])), mcu_event="NORMAL", msg="满载解除")
                 else:
